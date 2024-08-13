@@ -1,13 +1,13 @@
 <div align="right">
   
-[中文简体](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.0.1/rm_driver/doc/%E7%9D%BF%E5%B0%94%E6%9B%BC%E6%9C%BA%E6%A2%B0%E8%87%82ROS2rm_driver%E8%AF%9D%E9%A2%98%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E.md)|
-[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.0.1/rm_driver/doc/RealMan%20Robotic%20Arm%20rm_driver%20Topic%20Detailed%20Description%20(ROS2).md)
+[中文简体](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_driver/doc/%E7%9D%BF%E5%B0%94%E6%9B%BC%E6%9C%BA%E6%A2%B0%E8%87%82ROS2rm_driver%E8%AF%9D%E9%A2%98%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E.md)|
+[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_driver/doc/RealMan%20Robotic%20Arm%20rm_driver%20Topic%20Detailed%20Description%20(ROS2).md)
 
 </div>
 
 <div align="center">
 
-# 睿尔曼机械臂接口函数说明(ROS2)V1.1.0
+# 睿尔曼机械臂接口函数说明(ROS2)V1.1.1
 
 
  
@@ -21,6 +21,7 @@
 | :---: | :---- | :---: |
 |V1.0 | 2024-2-18 | 拟制|
 |V1.1 | 2024-7-8  | 修订（添加示教指令3.6） |
+|V1.1.1| 2024-8-13| 修订（添加查询六维力数据）|
 
 </div>
 
@@ -68,7 +69,8 @@
 * 3.10.1[设置力位混合控制](#设置力位混合控制)
 * 3.10.2[结束力位混合控制](#结束力位混合控制)
 * 3.11[末端六维力传感器的使用](#末端六维力传感器的使用)
-* 3.11.1[清空六维力数据](#清空六维力数据)
+* 3.11.1[查询六维力数据](#查询六维力数据)
+* 3.11.2[清空六维力数据](#清空六维力数据)
 * 3.12[末端五指灵巧手控制](#末端五指灵巧手控制)
 * 3.12.1[设置灵巧手手势序号](#设置灵巧手手势序号)
 * 3.12.2[设置灵巧手动作序列](#设置灵巧手动作序列)
@@ -363,6 +365,13 @@
 | 返回查询示例 | ros2 topic echo /rm_driver/clear_force_data_result |
 ### 末端六维力传感器的使用
 睿尔曼RM-65F机械臂末端配备集成式六维力传感器，无需外部走线，用户可直接通过ROS话题对六维力进行操作。
+#### 查询六维力数据
+| 功能描述 | 查询六维力数据 |
+| :---: | :---- |
+| 参数说明 | std_msgs::msg::Empty |
+| 命令示例 | ros2 topic pub rm_driver/get_force_data_cmd std_msgs/msg/Empty "{}" |
+| 返回值 | 成功返回对应坐标系六维力数据。 |
+| 返回查询示例 | ros2 topic echo /rm_driver/get_force_data_result原始数据<br>ros2 topic echo /rm_driver/get_zero_force_data_result系统受力数据<br>ros2 topic echo /rm_driver/get_work_force_data_result工作坐标系受理数据<br>ros2 topic echo /rm_driver/get_tool_force_data_result工具坐标系受理数据 |
 #### 清空六维力数据
 | 功能描述 | 清空六维力数据 |
 | :---: | :---- |

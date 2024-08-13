@@ -1,12 +1,12 @@
 <div align="right">
 
-[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_gazebo/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_gazebo/README.md)
+[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_gazebo/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_gazebo/README.md)
  
 </div>
 
 <div align="center">
 
-# RealMan Robotic Arm rm_gazebo User Manual V1.1
+# RealMan Robotic Arm rm_gazebo User Manual V1.1.1
 
 RealMan Intelligent Technology (Beijing) Co., Ltd. 
 
@@ -16,6 +16,7 @@ Revision History:
 | :---: | :----: | :---:   |
 |V1.0	  | 2/19/2024 | Draft |
 |V1.1	  | 7/3 /2024 | Amend(Add GEN72 adapter files) |
+|V1.1.1   | 8/13/2024 | Amend(Add arm type description)|
 
 </div>
 

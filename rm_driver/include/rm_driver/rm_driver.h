@@ -63,7 +63,6 @@
 #include "rm_ros_interfaces/msg/liftspeed.hpp"
 #include "rm_ros_interfaces/msg/liftstate.hpp"
 #include "rm_ros_interfaces/msg/liftheight.hpp"
-
 #include <std_msgs/msg/u_int32.hpp>
 #include <std_msgs/msg/int32.hpp>
 #include <std_msgs/msg/empty.hpp>
@@ -92,7 +91,6 @@ int udp_cycle_g = 5;
 int arm_dof_g = 6;
 //ctrl+c触发信号
 bool ctrl_flag = false;
-int count_number;
 //api类
 RM_Service Rm_Api;
 //机械臂TCp网络通信套接字
@@ -199,6 +197,8 @@ public:
     void Arm_Get_Current_Arm_State_Callback(const std_msgs::msg::Empty::SharedPtr msg);
     /*********************************六维力数据清零******************************/
     void Arm_Clear_Force_Data_Callback(const std_msgs::msg::Bool::SharedPtr msg);
+    /*********************************六维力数据获取******************************/
+    void Arm_Get_Force_Data_Callback(const std_msgs::msg::Empty::SharedPtr msg);
     
 /***************************************************************end******************************************************/
 private:
@@ -406,10 +406,19 @@ private:
     /***************************************获取机械臂当前状态订阅器************************************/
     rclcpp::Subscription<std_msgs::msg::Empty>::SharedPtr Get_Current_Arm_State_Cmd;
 
+/********************************************************************六维力***********************************************************/
     /****************************************六维力数据清零发布器***************************************/
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr Clear_Force_Data_Result;
     /******************************************六维力数据清零订阅器*************************************/
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr Clear_Force_Data_Cmd;
+    /********************************************六维力数据获取发布器****************************************/
+    rclcpp::Publisher<rm_ros_interfaces::msg::Sixforce>::SharedPtr Get_Force_Data_Result;
+    rclcpp::Publisher<rm_ros_interfaces::msg::Sixforce>::SharedPtr Get_Zero_Force_Result;
+    rclcpp::Publisher<rm_ros_interfaces::msg::Sixforce>::SharedPtr Get_Work_Zero_Result;
+    rclcpp::Publisher<rm_ros_interfaces::msg::Sixforce>::SharedPtr Get_Tool_Zero_Result;
+    /******************************************六维力数据获取订阅器*************************************/
+    rclcpp::Subscription<std_msgs::msg::Empty>::SharedPtr Get_Force_Data_Cmd;
+/********************************************************************end***********************************************************/
 
     std::string arm_ip_ = "192.168.1.18";    
     std::string udp_ip_ = "192.168.1.10";
@@ -436,31 +445,13 @@ public:
     void udp_timer_callback();
     void heart_timer_callback();
     bool read_data();
-//   : Node("UdpPublisherNode"), count_(0)
-//   {
-//     publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
-//     auto timer_callback =
-//       [this]() -> void {
-//         auto message = std_msgs::msg::String();
-//         message.data = "Hello World! " + std::to_string(this->count_++);
-
-//         // Extract current thread
-//         auto curr_thread = string_thread_id();
-
-//         // Prep display message
-//         auto info_message = "\n<<THREAD " + curr_thread + ">> Publishing '%s'";
-//         RCLCPP_INFO(this->get_logger(), info_message, message.data.c_str());
-//         this->publisher_->publish(message);
-//       };
-//     timer_ = this->create_wall_timer(500ms, timer_callback);
-//   }
 
 private:
     rclcpp::CallbackGroup::SharedPtr callback_group_time1_;
     rclcpp::CallbackGroup::SharedPtr callback_group_time2_;
     rclcpp::CallbackGroup::SharedPtr callback_group_time3_;
-    rclcpp::TimerBase::SharedPtr Udp_Timer;                  //UDP定时器
-    rclcpp::TimerBase::SharedPtr Heart_Timer;                         
+    rclcpp::TimerBase::SharedPtr Udp_Timer;                             //UDP定时器
+    rclcpp::TimerBase::SharedPtr Heart_Timer;                           //心跳定时器，检查断开情况
     /*****************************************************UDP数据发布话题************************************************/
     rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr Joint_Position_Result;                                //关节当前状态发布器
     rclcpp::Publisher<geometry_msgs::msg::Pose>::SharedPtr Arm_Position_Result;                                      //末端位姿当前状态发布器

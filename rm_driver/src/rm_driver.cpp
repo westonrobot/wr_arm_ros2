@@ -1316,6 +1316,56 @@ void RmArm::Arm_Clear_Force_Data_Callback(const std_msgs::msg::Bool::SharedPtr m
     }
 }
 
+void RmArm::Arm_Get_Force_Data_Callback(const std_msgs::msg::Empty::SharedPtr msg)
+{
+    rm_ros_interfaces::msg::Sixforce force;
+    rm_ros_interfaces::msg::Sixforce zero_force;
+    rm_ros_interfaces::msg::Sixforce work_zero;
+    rm_ros_interfaces::msg::Sixforce tool_zero;
+    float force_data[6];
+    float zero_force_data[6];
+    float work_zero_data[6];
+    float tool_zero_data[6];
+    copy = msg;
+    u_int32_t res;
+    res = Rm_Api.Service_Get_Force_Data(m_sockhand, force_data, zero_force_data, work_zero_data, tool_zero_data);
+    if(res == 0)
+    {
+        force.force_fx = force_data[0];
+        force.force_fy = force_data[1];
+        force.force_fz = force_data[2];
+        force.force_mx = force_data[3];
+        force.force_my = force_data[4];
+        force.force_mz = force_data[5];
+        Get_Force_Data_Result->publish(force);
+        zero_force.force_fx = zero_force_data[0];
+        zero_force.force_fy = zero_force_data[1];
+        zero_force.force_fz = zero_force_data[2];
+        zero_force.force_mx = zero_force_data[3];
+        zero_force.force_my = zero_force_data[4];
+        zero_force.force_mz = zero_force_data[5];
+        Get_Zero_Force_Result->publish(zero_force);
+        work_zero.force_fx = work_zero_data[0];
+        work_zero.force_fy = work_zero_data[1];
+        work_zero.force_fz = work_zero_data[2];
+        work_zero.force_mx = work_zero_data[3];
+        work_zero.force_my = work_zero_data[4];
+        work_zero.force_mz = work_zero_data[5];
+        Get_Work_Zero_Result->publish(work_zero);
+        tool_zero.force_fx = tool_zero_data[0];
+        tool_zero.force_fy = tool_zero_data[1];
+        tool_zero.force_fz = tool_zero_data[2];
+        tool_zero.force_mx = tool_zero_data[3];
+        tool_zero.force_my = tool_zero_data[4];
+        tool_zero.force_mz = tool_zero_data[5];
+        Get_Tool_Zero_Result->publish(tool_zero);
+    }
+    else
+    {
+        RCLCPP_INFO (this->get_logger(),"Arm get force data error code is %d\n",res);
+    }
+}
+
 void Udp_RobotStatuscallback(RobotStatus Udp_RM_Callback)
 {
     for(int i = 0; i < 6; i++)
@@ -1363,7 +1413,6 @@ void UdpPublisherNode::udp_timer_callback()
     {
         Rm_Api.Service_Realtime_Arm_Joint_State(Udp_RobotStatuscallback);
         udp_joint_error_code_.dof = 6;
-        count_number++;
         for(int i = 0;i<6;i++)
         {
             udp_real_joint_.position[i] = Udp_RM_Joint.joint[i] * DEGREE_RAD;
@@ -1445,6 +1494,7 @@ void UdpPublisherNode::udp_timer_callback()
         RCLCPP_INFO (this->get_logger(),"Connect success\n");
     }
 }
+
 void UdpPublisherNode::heart_timer_callback()
 {
     if(connect_state == 0)
@@ -1456,6 +1506,7 @@ void UdpPublisherNode::heart_timer_callback()
         ;
     }
 }
+
 bool UdpPublisherNode::read_data()
 {
     memset(udp_socket_buffer, 0, sizeof(udp_socket_buffer));
@@ -1859,11 +1910,25 @@ RmArm::RmArm():
     Get_Current_Arm_State_Cmd = this->create_subscription<std_msgs::msg::Empty>("rm_driver/get_current_arm_state_cmd",rclcpp::ParametersQoS(),
         std::bind(&RmArm::Arm_Get_Current_Arm_State_Callback,this,std::placeholders::_1),
         sub_opt2);
+/*********************************************************************六维力***************************************************************/
     /*****************************************************六维力数据清零**********************************************/
     Clear_Force_Data_Result = this->create_publisher<std_msgs::msg::Bool>("rm_driver/clear_force_data_result", rclcpp::ParametersQoS());
     Clear_Force_Data_Cmd = this->create_subscription<std_msgs::msg::Bool>("rm_driver/clear_force_data_cmd",rclcpp::ParametersQoS(),
         std::bind(&RmArm::Arm_Clear_Force_Data_Callback,this,std::placeholders::_1),
         sub_opt2);
+    /******************************************************获取六维力数据************************************************/
+    /***************************************************传感器受到的外力数据***********************************************/
+    Get_Force_Data_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/get_force_data_result", rclcpp::ParametersQoS());
+    /***************************************************系统受到的外力数据***********************************************/
+    Get_Zero_Force_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/get_zero_force_data_result", rclcpp::ParametersQoS());
+    /************************************************工作坐标系下系统受到的外力数据******************************************/
+    Get_Work_Zero_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/get_work_force_data_result", rclcpp::ParametersQoS());
+    /***********************************************工具坐标系下系统受到的外力数据********************************************/
+    Get_Tool_Zero_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/get_tool_force_data_result", rclcpp::ParametersQoS());
+    Get_Force_Data_Cmd = this->create_subscription<std_msgs::msg::Empty>("rm_driver/get_force_data_cmd",rclcpp::ParametersQoS(),
+        std::bind(&RmArm::Arm_Get_Force_Data_Callback,this,std::placeholders::_1),
+        sub_opt2);
+/*******************************************************************************end*****************************************************************/
 }   
 
 

@@ -1,12 +1,12 @@
 <div align="right">
  
-[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_gazebo/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_gazebo/README.md)
+[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_gazebo/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_gazebo/README.md)
 
 </div>
 
 <div align="center">
 
-# 睿尔曼机器人rm_gazebo使用说明书V1.1
+# 睿尔曼机器人rm_gazebo使用说明书V1.1.1
  
 睿尔曼智能科技（北京）有限公司 
 文件修订记录：
@@ -15,6 +15,7 @@
 | :---: | :-----: | :---: |
 |V1.0    |2024-2-19  |拟制 |
 |V1.1    |2024-7-8   |修订（添加gen72相关适配文件） |
+|V1.1.1  |2024-8-13  |修订（添加机械臂型号适配说明） |
 
 </div>
 
@@ -42,9 +43,9 @@ rm@rm-desktop:~$ ros2 launch rm_gazebo gazebo_<arm_type>_demo.launch.py
 ![image](doc/rm_gazebo1.png)
 之后我们使用如下指令启动moveit2控制gazebo中的仿真机械臂。
 ```
-rm@rm-desktop:~$ ros2 launch rm_65_config gazebo_moveit_demo.launch.py
+rm@rm-desktop:~$ ros2 launch rm_<arm_type>_config gazebo_moveit_demo.launch.py
 ```
-弹出rviz2的控制界面后就可以进行moveit2和gazebo的仿真控制了。
+在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、75、gen72，运行成功后弹出rviz2的控制界面后就可以进行moveit2和gazebo的仿真控制了。
 ![image](doc/rm_gazebo2.png)
 ## rm_gazebo功能包架构说明
 ### 功能包文件总览
