@@ -16,6 +16,7 @@ Revision History:
 | :---: | :----: | :---:   |
 |V1.0	  | 2/19/2024 | Draft |
 |V1.1	  | 7/3 /2024 | Amend(Add GEN72 adapter files) |
+|V1.1.1   | 8/13/2024 | Amend(Add arm type description)|
 
 </div>
 
@@ -45,9 +46,9 @@ In practice, the above <arm_type> needs to be replaced by the actual model of th
 ![image](doc/rm_gazebo1.png)
 Then, we use the following command to launch moveit2 to control the simulation robot arm in Gazebo.
 ```
-rm@rm-desktop:~$ ros2 launch rm_65_config gazebo_moveit_demo.launch.py
+rm@rm-desktop:~$ ros2 launch rm_<arm_type>_config gazebo_moveit_demo.launch.py
 ```
-After the control interface of rviz2 pops up, you can perform the simulation control of moveit2 and Gazebo.
+In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65, 75, and gen72.After the control interface of rviz2 pops up, you can perform the simulation control of moveit2 and Gazebo.
 ![image](doc/rm_gazebo2.png)
 ## rm_gazebo_Package_Architecture_Description
 ## Overview_of_Package_Files

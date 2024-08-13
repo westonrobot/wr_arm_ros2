@@ -21,6 +21,7 @@ Revision History:
 | :---: | :---- | :---: |
 |V1.0 | 2024-2-18 | Draft |
 |V1.1 | 2024-7-8  | Amend(Add teaching instructions3.6) |
+|V1.1.1| 2024-8-13| Amend(Add six-axis topic)           |
 
 </div>
 
@@ -68,7 +69,8 @@ Revision History:
 * 3.10.1[Set the force-position mixing control](#Set_the_force-position_mixing_control)
 * 3.10.2[Stop the force-position mixing control](#Stop_the_force-position_mixing_control)
 * 3.11[Functions related to the use of six-axis force sensors at the end - optional](#Functions_related_to_the_use_of_six-axis_force_sensors_at_the_end)
-* 3.11.1[Clearing the six-axis force Data](#Clearing_the_six-axis_force_Data)
+* 3.11.1[Query the six-axis force data](#Query_the_six-axis_force_data)
+* 3.11.2[Clearing the six-axis force Data](#Clearing_the_six-axis_force_Data)
 * 3.12[Functions related to the control of the five-finger dexterous hand - optional](#Functions_related_to_the_control_of_the_five-finger_dexterous_hand)
 * 3.12.1[Setting the serial number of the dexterous hand posture](#Setting_the_serial_number_of_the_dexterous_hand_posture)
 * 3.12.2[Set the dexterous hand action sequence number](#Set_the_dexterous_hand_action_sequence_number)
@@ -361,6 +363,13 @@ The RealMan robotic arm is equipped with an Inspire Robots EG2-4C2 gripper. The 
 | Return example | ros2 topic echo /rm_driver/clear_force_data_result |
 ### Functions_related_to_the_use_of_six-axis_force_sensors_at_the_end
 The RealMan RM-65F robotic arm has an integrated six-axis force sensor at the end without external wiring. Users can operate the six-axis force through ROS topics.
+#### Query_the_six-axis_force_data
+| Function description | Query the six-axis force data|
+| :---: | :---- |
+| Parameter description | std_msgs::msg::Empty |
+| Command example | ros2 topic pub rm_driver/get_force_data_cmd std_msgs/msg/Empty "{}" |
+| Return value | Successfully returned six-axis force data in the corresponding coordinate system. |
+| Return example | ros2 topic echo /rm_driver/get_force_data_result<br>ros2 topic echo /rm_driver/get_zero_force_data_result<br>ros2 topic echo /rm_driver/get_work_force_data_result<br>ros2 topic echo /rm_driver/get_tool_force_data_result |
 #### Clearing_the_six-axis_force_Data
 | Function description | Clearing the six-axis force data |
 | :---: | :---- |
