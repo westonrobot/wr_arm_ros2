@@ -21,7 +21,7 @@
 
 ## 3.项目下载
 
-通过项目链接下载本项目工程文件到本地：[wwwwwwwwwwwwwwwwwww]()
+通过项目链接下载本项目工程文件到本地：[ros2_rm_robot](https://github.com/RealManRobot/ros2_rm_robot/tree/humble)
 
 ## 4.环境配置
 
@@ -34,7 +34,7 @@
 **配置过程**
 
 1. 首先需要准备好Ubuntu22.04操作系统的虚拟机或其他设备。
-2. 安装ROS2环境[humble](#https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html),也可参考ROS2-humble功能包中的安装说明进行安装。
+2. 安装ROS2环境[humble](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html),也可参考ROS2-humble功能包中的安装说明进行安装。
 3. ROS2-Humble功能包安装
 
     建工作空间和src文件夹
