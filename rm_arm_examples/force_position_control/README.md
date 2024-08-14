@@ -27,8 +27,8 @@
 ##  **4. 安装说明**
 
 1. 首先需要准备好Ubuntu20.04操作系统的虚拟机或其他设备。
-2. 安装ROS2环境[foxy](#https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html),也可参考ROS2-foxy功能包中的安装说明进行安装。
-3. 参考[链接](#https://github.com/RealManRobot/ros2_rm_robot/tree/foxy)将提供的ROS2功能包编译到当前环境，并使用source指令添加该功能包的环境变量。    
+2. 安装ROS2环境[foxy](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html),也可参考ROS2-foxy功能包中的安装说明进行安装。
+3. 参考[链接](https://github.com/RealManRobot/ros2_rm_robot/tree/foxy)将提供的ROS2功能包编译到当前环境，并使用source指令添加该功能包的环境变量。    
     新建工作空间和src文件
     ```
     mkdir -p ~/ros2_ws/src
