@@ -1,4 +1,4 @@
-# ARM_FORCE_POSITION_CONTROL_DEMO
+# 力位混合控制规划`ARM_FORCE_POSITION_CONTROL_DEMO`
 
 ---
 
@@ -18,11 +18,11 @@
 └── src                                      <-C++源码文件夹
     └── api_force_position_control_demo.cpp  <-源码文件
 ```
-## 3.项目下载
+## **3.项目下载**
 
 通过项目链接下载本项目工程文件到本地：[ros2_rm_robot](https://github.com/RealManRobot/ros2_rm_robot/tree/foxy)
 
-## 4.环境配置
+## **4.环境配置**
 
 | 项目 | 内容 |
 | :-- | :-- |
