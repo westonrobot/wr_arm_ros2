@@ -18,17 +18,25 @@
 └── src                                      <-C++源码文件夹
     └── api_Get_Arm_State_demo.cpp           <-源码文件
 ```
-## **3.环境与依赖**
 
-* Ubuntu20.04。
-* ROS版本为foxy
-* 机械臂的ROS2-foxy功能包。
+## 3.项目下载
 
-##  **4. 安装说明**
+通过项目链接下载本项目工程文件到本地：[ros2_rm_robot](https://github.com/RealManRobot/ros2_rm_robot/tree/foxy)
+
+## 4.环境配置
+
+| 项目 | 内容 |
+| :-- | :-- |
+| 系统 | Ubuntu20.04 |
+| ROS版本 | foxy |
+| 依赖 | 机械臂的ROS2-foxy功能包 |
+
+**配置过程**
 
 1. 首先需要准备好Ubuntu20.04操作系统的虚拟机或其他设备。
 2. 安装ROS2环境[foxy](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html),也可参考ROS2-foxy功能包中的安装说明进行安装。
-3. 参考[链接](https://github.com/RealManRobot/ros2_rm_robot/tree/foxy)将提供的ROS2功能包编译到当前环境，并使用source指令添加该功能包的环境变量
+3. ROS2-Foxy功能包安装  
+
     新建工作空间和src文件，
     ```
     mkdir -p ~/ros2_ws/src
