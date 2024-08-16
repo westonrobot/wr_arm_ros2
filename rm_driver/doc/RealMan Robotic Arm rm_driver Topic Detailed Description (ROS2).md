@@ -214,7 +214,7 @@ This section describes how to query and control the robotic arm through the topi
 | Parameter description | ROS msg std_msgs::msg::Empty |
 | Command example | ros2 topic pub --once /rm_driver/get_all_work_frame_cmd std_msgs/msg/Empty "{}" |
 | Return value | All work coordinate system names |
-| Return example | ros2 topic echo /rm_driver/change_work_frame_result |
+| Return example | ros2 topic echo /rm_driver/get_all_work_frame_result |
 ### Functions_related_to_the_arm_state_query
 #### Get_the_current_state_of_the_robot_arm-return_each_joint_angle_and_Euler_angle
 | Function description | Retrieve the current state of the robotic arm |
@@ -428,7 +428,7 @@ The RealMan robotic arm can be integrated with the self-developed lifting mechan
 | Function description | Position closed-loop control of the lifting mechanism |
 | :---: | :---- |
 | Parameter description | Liftheight.msg<br>uint16 height： target height, unit: mm, range: 0-2600.<br>uint16 speed：speed percentage, 1-100.<br>bool data: whether it is a blocking mode, bool type, true: blocking, false: non-blocking. |
-| Command example | ros2 topic pub --once /rm_driver/set_lift_speed_cmd rm_ros_interfaces/msg/Liftspeed "speed: 100" |
+| Command example | ros2 topic pub --once /rm_driver/set_lift_height_cmd rm_ros_interfaces/msg/Liftheight "height: 0<br>speed: 10<br>block: true" |
 | Return value | Successful return: true; failure returns: false, the driver terminal returns an error code. |
 | Return example | ros2 topic echo /rm_driver/set_lift_height_result |
 #### Get_the_lifting_mechanism_state
