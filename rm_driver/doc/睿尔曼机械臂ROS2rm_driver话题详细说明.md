@@ -208,7 +208,7 @@
 | 参数说明 | ROS自带msg std_msgs::msg::Empty |
 | 命令示例 | ros2 topic pub --once /rm_driver/get_curr_workFrame_cmd std_msgs/msg/Empty "{}" |
 | 返回值 | true-设置成功，false-设置失败 |
-| 返回查询示例 | ros2 topic echo /rm_driver/get_curr_workFrame_result |
+| 返回查询示例 | ros2 topic echo /rm_driver/get_all_workFrame_result |
 #### 查询所有工作坐标系
 | 功能描述 | 切换当前工作坐标系 |
 | :---: | :---- |
