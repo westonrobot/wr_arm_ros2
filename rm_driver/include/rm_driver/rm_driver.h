@@ -33,6 +33,7 @@
 #include <fcntl.h>  
 
 #include "rm_service.h"
+#include "rm_define.h"
 #include "rm_ros_interfaces/msg/movej.hpp"
 #include "rm_ros_interfaces/msg/movel.hpp"
 #include "rm_ros_interfaces/msg/movec.hpp"

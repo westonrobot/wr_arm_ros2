@@ -489,21 +489,17 @@ void RmArm::Set_Stop_Teach_Callback(std_msgs::msg::Bool::SharedPtr msg)
 
 void RmArm::Arm_Get_Realtime_Push_Callback(const std_msgs::msg::Empty::SharedPtr msg)
 {
-    int cycle;
-    int port;
-    bool enable;
-    int force_coordinate;
-    char ip[16];
     u_int32_t res;
     rm_ros_interfaces::msg::Setrealtimepush Setrealtime_msg;
     copy = msg;
-    res = Rm_Api.Service_Get_Realtime_Push(m_sockhand, &cycle, &port, &enable, &force_coordinate, ip);
+    Realtime_Push_Config config;
+    res = Rm_Api.Service_Get_Realtime_Push(m_sockhand, &config);
     if(res == 0)
     {
-        Setrealtime_msg.cycle = cycle;
-        Setrealtime_msg.port = port;
-        Setrealtime_msg.force_coordinate = force_coordinate;
-        Setrealtime_msg.ip = ip;
+        Setrealtime_msg.cycle = config.cycle;
+        Setrealtime_msg.port = config.port;
+        Setrealtime_msg.force_coordinate = config.force_coordinate;
+        Setrealtime_msg.ip = config.ip;
         this->Get_Realtime_Push_Result->publish(Setrealtime_msg);
     }
     else
@@ -512,18 +508,21 @@ void RmArm::Arm_Get_Realtime_Push_Callback(const std_msgs::msg::Empty::SharedPtr
 
 void RmArm::Arm_Set_Realtime_Push_Callback(const rm_ros_interfaces::msg::Setrealtimepush::SharedPtr msg)
 {
-    int cycle;
-    int port;
-    int force_coordinate;
-    
+    Realtime_Push_Config config;
     u_int32_t res;
     std_msgs::msg::Bool set_realtime_result;
-    port = msg->port ;
-    cycle = msg->cycle;
-    force_coordinate = msg->force_coordinate;
-    const char *ip = msg->ip.data();
-    
-    res = Rm_Api.Service_Set_Realtime_Push(m_sockhand, cycle, port, true, force_coordinate, ip);
+    config.port = msg->port ;
+    config.cycle = msg->cycle;
+    config.force_coordinate = msg->force_coordinate;
+    config.enable = true;
+    strcpy(config.ip,msg->ip.data());
+    UDP_Custom_Config config_enable;
+    config_enable.expand_state = 0;
+    config_enable.hand_state = 0;
+    config_enable.joint_speed = 0;
+    config_enable.lift_state = 0;
+    config.custom = config_enable;
+    res = Rm_Api.Service_Set_Realtime_Push(m_sockhand, config);
     if(res == 0)
     {
         set_realtime_result.data = true;
@@ -539,20 +538,23 @@ void RmArm::Arm_Set_Realtime_Push_Callback(const rm_ros_interfaces::msg::Setreal
 
 void RmArm::Set_UDP_Configuration(int udp_cycle, int udp_port, int udp_force_coordinate, std::string udp_ip)
 {
-    int cycle;
-    int port;
-    int force_coordinate;
-
     u_int32_t res;
-    port = udp_port ;
-    cycle = udp_cycle/5;
-    force_coordinate = udp_force_coordinate;
-    const char *ip = udp_ip.c_str();
-    
-    res = Rm_Api.Service_Set_Realtime_Push(m_sockhand, cycle, port, true, force_coordinate, ip);
+    Realtime_Push_Config config;
+    config.port = udp_port ;
+    config.cycle = udp_cycle/5;
+    config.force_coordinate = udp_force_coordinate;
+    config.enable = true;
+    strcpy(config.ip,udp_ip.data());
+    UDP_Custom_Config config_enable;
+    config_enable.expand_state = 0;
+    config_enable.hand_state = 0;
+    config_enable.joint_speed = 0;
+    config_enable.lift_state = 0;
+    config.custom = config_enable;
+    res = Rm_Api.Service_Set_Realtime_Push(m_sockhand, config);
     if(res == 0)
     {
-        RCLCPP_INFO (this->get_logger(),"UDP_Configuration is cycle:%dms,port:%d,force_coordinate:%d,ip:%s\n", udp_cycle, port, udp_force_coordinate, udp_ip.c_str());
+        RCLCPP_INFO (this->get_logger(),"UDP_Configuration is cycle:%dms,port:%d,force_coordinate:%d,ip:%s\n", udp_cycle, udp_port, udp_force_coordinate, udp_ip.c_str());
     }
     else
     {
@@ -1613,6 +1615,11 @@ RmArm::RmArm():
     {
         Rm_Api.Service_RM_API_Init(651, NULL);
         realman_arm = 651;
+    }
+    else if(arm_type_ == "RM_eco63")
+    {
+        Rm_Api.Service_RM_API_Init(634, NULL);
+        realman_arm = 634;
     }
     else if(arm_type_ == "GEN_72")
     {

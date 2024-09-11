@@ -1,12 +1,12 @@
 <div align="right">
  
-[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_bringup/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_bringup/README.md)
+[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/foxy/rm_bringup/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/foxy/rm_bringup/README.md)
 
 </div>
 
 <div align="center">
 
-# 睿尔曼机器人rm_bringup使用说明书V1.1
+# 睿尔曼机器人rm_bringup使用说明书V1.2
  
 睿尔曼智能科技（北京）有限公司 
 文件修订记录：
@@ -15,6 +15,7 @@
 | :---: | :-----: | :---: |
 |V1.0    |2024-2-19  |拟制 |
 |V1.1    |2024-7-8   |修订(添加GEN72适配文件) |
+|V1.2    |2024-9-10  |修订(添加ECO63适配文件) |
 
 </div>
 
@@ -41,7 +42,7 @@ rm_bringup功能包为实现多个launch文件同时运行所设计的功能包�
 ```
 rm@rm-desktop:~$ ros2 launch rm_bringup rm_<arm_type>_bringup.launch.py
 ```
-在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、75、gen72。
+在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、eco63、75、gen72。
 例如65机械臂的启动命令：
 ```
 rm@rm-desktop:~$ ros2 launch rm_bringup rm_65_bringup.launch.py
@@ -64,6 +65,7 @@ rm@rm-desktop:~$ ros2 launch rm_bringup rm_65_bringup.launch.py
 │   ├── rm_75_bringup.launch.py         #75臂moveit2启动文件
 │   ├── rm_75_gazebo.launch.py          #75臂gazebo启动文件
 │   ├── rm_eco65_bringup.launch.py      #eco65臂moveit2启动文件
+│   ├── rm_eco63_bringup.launch.py      #eco63臂moveit2启动文件
 │   └── rm_gen72_bringup.launch.py      #gen72臂moveit2启动文件
 ├── package.xml                         #依赖说明文件
 ├── README_CN.md                        #中文说明文档

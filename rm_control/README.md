@@ -6,7 +6,7 @@
 
 <div align="center">
 
-# RealMan Robotrm_controlUser Manual V1.1
+# RealMan Robotrm_controlUser Manual V1.2
 
 RealMan Intelligent Technology (Beijing) Co., Ltd. 
 
@@ -16,6 +16,7 @@ Revision History:
 | :---: | :----: | :---:   |
 |V1.0	  | 2/19/2024 | Draft |
 |V1.1	  | 7/8 /2024 | Amend(Add GEN72 adapter files) |
+|V1.2 | 9/11 /2024| Amend(Add ECO63 adapter files) |
 
 </div>
 
@@ -44,7 +45,7 @@ First, after configuring the environment and completing the connection, we can d
 ```
 rm@rm-desktop:~$ ros2 launch  rm_control rm_<arm_type>_control.launch.py
 ```
-In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65, gen72, and 75.  
+In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65、eco63, gen72, and 75.  
 For example, the launch command of 65 robotic arm:
 ```
 rm@rm-desktop:~$ ros2 launch  rm_control rm_65_control.launch.py
@@ -80,6 +81,7 @@ The current rm_driver package is composed of the following files.
 │   ├── rm_65_control.launch.py        # 65 launch file
 │   ├── rm_75_control.launch.py        # 75 launch file
 │   ├── rm_eco65_control.launch.py     # eco65 launch file
+│   ├── rm_eco63_control.launch.py     # eco63 launch file
 │   └── rm_gen72_control.launch.py     # gen72 launch file
 ├── package.xml                        # dependency declaration file
 ├── README_CN.md

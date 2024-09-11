@@ -10,7 +10,7 @@
 The package is mainly used for providing ROS2 support for the robotic arm, and the following is the use environment.
 
 * Currently supported robotic arms are RM65 series, RM75 series, ECO65 series, RML63 series, and the details can be referred to the website [RealMan robots](http://www.realman-robotics.com/).
-* Version V1.1.0.
+* Version V1.2.
 * The supported robotic arm controller version is 1.4.3 or above.
 * The Ubuntu version is 20.04.
 * The ROS2 version is foxy.
@@ -133,13 +133,15 @@ Use the following command to launch the gazebo to display the simulation robotic
 
 ```
 source ~/ros2_ws/install/setup.bash
-ros2 launch rm_bringup rm_<arm_type>_gazebo.launch.py
+ros2 launch rm_gazebo gazebo_<arm_type>_demo.launch.py
+ros2 launch rm_<arm_type>_config gazebo_moveit_demo.launch.py
 ```
 
-\<arm_type> needs to use 65, 75, eco65, 63 characters to replace it. For example, when using an RM65 robotic arm, the command is as follows.
+\<arm_type> needs to use 65, 75, eco65、eco63, 63 characters to replace it. For example, when using an RM65 robotic arm, the command is as follows.
 
 ```
-ros2 launch rm_bringup rm_65_gazebo.launch.py
+ros2 launch rm_gazebo gazebo_65_demo.launch.py
+ros2 launch rm_65_config gazebo_moveit_demo.launch.py
 ```
 
 After successful launch, you can use moveit2 for the control of the virtual robotic arm.
@@ -155,7 +157,7 @@ source ~/ros2_ws/install/setup.bash
 ros2 launch rm_bringup rm_<arm_type>_bringup.launch.py
 ```
 
-\<arm_type> needs to use 65, 75, eco65, 63 characters to replace it. For example, when using an RM65 robotic arm, the command is as follows.
+\<arm_type> needs to use 65, 75, eco65、eco63, 63 characters to replace it. For example, when using an RM65 robotic arm, the command is as follows.
 
 ```
 ros2 launch rm_bringup rm_65_bringup.launch.py

@@ -6,7 +6,7 @@
 
 <div align="center">
 
-# 睿尔曼机器人rm_moveit2_config使用说明书V1.1
+# 睿尔曼机器人rm_moveit2_config使用说明书V1.2
  
 睿尔曼智能科技（北京）有限公司 
 文件修订记录：
@@ -15,6 +15,7 @@
 | :---: | :-----: | :---: |
 |V1.0    |2024-2-19  |拟制 |
 |V1.1    |2024-7-8   |修订（添加GEN72适配） |
+|V1.2    |2024-9-10  |修订（添加ECO63适配） |
 
 </div>
 
@@ -42,7 +43,7 @@ rm_moveit2_config文件夹为实现moveit2控制真实机械臂的功能包，�
 ```
 rm@rm-desktop:~$ ros2 launch rm_<arm_type>_config demo.launch.py
 ```
-在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、75、gen72。  
+在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、eco63、75、gen72。  
 例如65机械臂的启动命令：  
 ```
 rm@rm-desktop:~$ ros2 launch rm_65_config demo.launch.py
@@ -71,7 +72,7 @@ rm@rm-desktop:~$ ros2 launch rm_control rm_<arm_type>_control.launch.py
 ```
 rm@rm-desktop:~$ ros2 launch rm_<arm_type>_config real_moveit_demo.launch.py
 ```
-注意以上指令均需要将<arm_type>更换为对应的机械臂型号，可选择的型号有65、63、eco65、75、gen72。  
+注意以上指令均需要将<arm_type>更换为对应的机械臂型号，可选择的型号有65、63、eco65、eco63、75、gen72。  
 完成以上操作后将会出现以下界面，我们可以通过拖动控制球的方式控制机械臂运动。  
 ![image](doc/rm_moveit2_config4.png)
 ## rm_moveit2_config架构说明
@@ -165,6 +166,31 @@ rm@rm-desktop:~$ ros2 launch rm_<arm_type>_config real_moveit_demo.launch.py
 │    │   ├── rm_eco65_description.ros2_control.xacro
 │    │   ├── rm_eco65_description.srdf
 │    │   ├── rm_eco65_description.urdf.xacro
+│    │   └── ros2_controllers.yaml
+│    ├── launch
+│    │   ├── demo.launch.py
+│    │   ├── gazebo_moveit_demo.launch.py
+│    │   ├── move_group.launch.py
+│    │   ├── moveit_rviz.launch.py
+│    │   ├── real_moveit_demo.launch.py
+│    │   ├── rsp.launch.py
+│    │   ├── setup_assistant.launch.py
+│    │   ├── spawn_controllers.launch.py
+│    │   ├── static_virtual_joint_tfs.launch.py
+│    │   └── warehouse_db.launch.py
+│    └── package.xml
+└── rm_eco63_config                                    #eco63机械臂moveit2功能包（文件解释参考63）
+│    ├── CMakeLists.txt
+│    ├── config
+│    │   ├── initial_positions.yaml
+│    │   ├── joint_limits.yaml
+│    │   ├── kinematics.yaml
+│    │   ├── moveit_controllers.yaml
+│    │   ├── moveit.rviz
+│    │   ├── pilz_cartesian_limits.yaml
+│    │   ├── rm_eco63_description.ros2_control.xacro
+│    │   ├── rm_eco63_description.srdf
+│    │   ├── rm_eco63_description.urdf.xacro
 │    │   └── ros2_controllers.yaml
 │    ├── launch
 │    │   ├── demo.launch.py

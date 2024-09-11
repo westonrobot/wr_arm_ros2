@@ -18,7 +18,7 @@ public:
 
     ///
     /// \brief Service_RM_API_Init              API初始化
-    /// \param dev_mode                 目标设备型号ARM_65/ARM_75/ARM_63_1/ARM_63_2/ARM_ECO65
+    /// \param dev_mode                 目标设备型号ARM_65/ARM_75/ARM_63_2/ARM_ECO62/ARM_ECO65/ARM_GEN72/ARM_ECO63
     /// \param pCallback                用于接收透传接口回调函数, 不需要可以传入NULL
     ///  RM_APISHARED_EXPORT
     ///
@@ -35,6 +35,12 @@ public:
     /// \return                                 API版本号
     ///
     RM_SERVICESHARED_EXPORT char * Service_API_Version();
+
+    ///
+    /// \brief Service_Algo_Version             查询API算法库版本信息
+    /// \return                                 API算法库版本信息
+    ///
+    RM_SERVICESHARED_EXPORT char * Service_Algo_Version();
 
     ///
     /// \brief Service_Arm_Socket_Start         连接机械臂
@@ -677,13 +683,13 @@ public:
     /// \param ArmSocket socket句柄
     /// \param joint 目标关节1~7角度数组
     /// \param v 速度比例1~100，即规划速度和加速度占关节最大线转速和加速度的百分比
-    /// \param r 轨迹交融半径，目前默认0。
+    /// \param r 交融半径百分比系数， 0~100。
     /// \param trajectory_connect：代表是否和下一条运动一起规划，0代表立即规划，1代表和下一条轨迹一起规划，当为1时，轨迹不会立即执行
     /// \param block RM_NONBLOCK-非阻塞，发送后立即返回；RM_BLOCK-阻塞，等待机械臂到达位置或者规划失败
     /// \return 0-成功，失败返回:错误码, rm_define.h查询.
     ///
     RM_SERVICESHARED_EXPORT int Service_Movej_Cmd(SOCKHANDLE ArmSocket, const float *joint,
-                                                  byte v, float r, int trajectory_connect, bool block);
+                                                  byte v, byte r, int trajectory_connect, bool block);
 
     ///
     /// \brief Service_MoveRotate_Cmd       环绕运动
@@ -692,10 +698,10 @@ public:
     /// \param rotateAngle                  旋转角度: 旋转角度, 单位(度)
     /// \param choose_axis
     /// \param v                            速度
-    /// \param r                            交融半径
+    /// \param r                            交融半径百分比系数， 0~100
     /// \param trajectory_connect           代表是否和下一条运动一起规划，0代表立即规划，1代表和下一条轨迹一起规划，当为1时，轨迹不会立即执行
     /// \return                             0-成功，失败返回:错误码, rm_define.h查询.
-    RM_SERVICESHARED_EXPORT int Service_MoveRotate_Cmd(SOCKHANDLE ArmSocket, int rotateAxis, float rotateAngle, Pose choose_axis, byte v, float r, int trajectory_connect, bool block);
+    RM_SERVICESHARED_EXPORT int Service_MoveRotate_Cmd(SOCKHANDLE ArmSocket, int rotateAxis, float rotateAngle, Pose choose_axis, byte v, byte r, int trajectory_connect, bool block);
 
     ///
     /// \brief cartesian_tool           沿工具端位姿移动
@@ -706,36 +712,36 @@ public:
     /// \param movelengthz:             沿Z轴移动长度，米为单位
     /// \param m_dev                    机械臂型号
     /// \param v                        速度
-    /// \param r                        交融半径
+    /// \param r                        交融半径百分比系数， 0~100
     /// \param trajectory_connect       代表是否和下一条运动一起规划，0代表立即规划，1代表和下一条轨迹一起规划，当为1时，轨迹不会立即执行
     /// \param block                    RM_NONBLOCK-非阻塞，发送后立即返回; RM_BLOCK-阻塞，等待机械臂到达位置或者规划失败
     /// \return                         0-成功，失败返回:错误码, rm_define.h查询.
     ///
-    RM_SERVICESHARED_EXPORT int Service_MoveCartesianTool_Cmd(SOCKHANDLE ArmSocket, float *Joint_Cur, float movelengthx, float movelengthy, float movelengthz, int m_dev, byte v, float r, int trajectory_connect, bool block);
+    RM_SERVICESHARED_EXPORT int Service_MoveCartesianTool_Cmd(SOCKHANDLE ArmSocket, float *Joint_Cur, float movelengthx, float movelengthy, float movelengthz, int m_dev, byte v, byte r, int trajectory_connect, bool block);
 
     ///
     /// \brief Service_Movel_Cmd 笛卡尔空间直线运动
     /// \param ArmSocket socket句柄
     /// \param pose 目标位姿,位置单位：米，姿态单位：弧度
     /// \param v 速度比例1~100，即规划速度和加速度占机械臂末端最大线速度和线加速度的百分比
-    /// \param r 轨迹交融半径，目前默认0。
+    /// \param r 交融半径百分比系数， 0~100。
     /// \param trajectory_connect：代表是否和下一条运动一起规划，0代表立即规划，1代表和下一条轨迹一起规划，当为1时，轨迹不会立即执行
     /// \param block RM_NONBLOCK-非阻塞，发送后立即返回；RM_BLOCK-阻塞，等待机械臂到达位置或者规划失败
     /// \return 0-成功，失败返回:错误码, rm_define.h查询.
     ///
-    RM_SERVICESHARED_EXPORT int Service_Movel_Cmd(SOCKHANDLE ArmSocket, Pose pose, byte v, float r, int trajectory_connect, bool block);
+    RM_SERVICESHARED_EXPORT int Service_Movel_Cmd(SOCKHANDLE ArmSocket, Pose pose, byte v, byte r, int trajectory_connect, bool block);
 
     ///
     /// \brief Service_Moves_Cmd 样条曲线运动
     /// \param ArmSocket socket句柄
     /// \param pose 目标位姿,位置单位：米，姿态单位：弧度
     /// \param v 速度比例1~100，即规划速度和加速度占机械臂末端最大线速度和线加速度的百分比
-    /// \param r 轨迹交融半径，目前默认0。
+    /// \param r 交融半径百分比系数， 0~100。
     /// \param trajectory_connect：代表是否和下一条运动一起规划，0代表立即规划，1代表和下一条轨迹一起规划，当为1时，轨迹不会立即执行，样条曲线运动需至少连续下发三个点位，否则运动轨迹为直线
     /// \param block RM_NONBLOCK-非阻塞，发送后立即返回；RM_BLOCK-阻塞，等待机械臂到达位置或者规划失败
     /// \return 0-成功，失败返回:错误码, rm_define.h查询.
     ///
-    RM_SERVICESHARED_EXPORT int Service_Moves_Cmd(SOCKHANDLE ArmSocket, Pose pose, byte v, float r, int trajectory_connect, bool block);
+    RM_SERVICESHARED_EXPORT int Service_Moves_Cmd(SOCKHANDLE ArmSocket, Pose pose, byte v, byte r, int trajectory_connect, bool block);
 
     ///
     /// \brief Service_Movec_Cmd 笛卡尔空间圆弧运动
@@ -743,14 +749,14 @@ public:
     /// \param pose_via 中间点位姿，位置单位：米，姿态单位：弧度
     /// \param pose_to 终点位姿
     /// \param v 速度比例1~100，即规划速度和加速度占机械臂末端最大角速度和角加速度的百分比
-    /// \param r 轨迹交融半径，目前默认0。
+    /// \param r 交融半径百分比系数， 0~100。
     /// \param loop 规划圈数，目前默认0.
     /// \param trajectory_connect：代表是否和下一条运动一起规划，0代表立即规划，1代表和下一条轨迹一起规划，当为1时，轨迹不会立即执行
     /// \param block RM_NONBLOCK-非阻塞，发送后立即返回；RM_BLOCK-阻塞，等待机械臂到达位置或者规划失败
     /// \return 0-成功，失败返回:错误码, rm_define.h查询.
     ///
     RM_SERVICESHARED_EXPORT int Service_Movec_Cmd(SOCKHANDLE ArmSocket, Pose pose_via, Pose pose_to,
-                                                  byte v, float r, byte loop, int trajectory_connect, bool block);
+                                                  byte v, byte r, byte loop, int trajectory_connect, bool block);
 
     ///
     /// \brief Service_Movej_CANFD 角度不经规划，直接通过CANFD透传给机械臂
@@ -762,7 +768,22 @@ public:
     /// 只要控制器运行正常并且目标角度在可达范围内，机械臂立即返回成功指令，此时机械臂可能仍在运行；
     /// 若有错误，立即返回失败指令。
     RM_SERVICESHARED_EXPORT int Service_Movej_CANFD(SOCKHANDLE ArmSocket, const float *joint, bool follow, float expand);
+    ///
+    /// \brief Service_Movej_Follow 关节空间跟随运动
+    /// \param ArmSocket socket句柄
+    /// \param joint 关节1~7目标角度数组，单位°
+    /// \return 0-成功，失败返回:错误码, rm_define.h查询.
+    /// 只要控制器运行正常并且目标角度在可达范围内，机械臂立即返回成功指令，此时机械臂可能仍在运行；
+    /// 若有错误，立即返回失败指令。
+    RM_SERVICESHARED_EXPORT int Service_Movej_Follow(SOCKHANDLE ArmSocket, const float *joint);
 
+    ///
+    /// \brief Service_Movep_Follow 笛卡尔空间跟随运动
+    /// \param ArmSocket socket句柄
+    /// \param pose 位姿 (优先采用四元数表达)
+    /// \return 0-成功，失败返回:错误码, rm_define.h查询.
+    ///
+    RM_SERVICESHARED_EXPORT int Service_Movep_Follow(SOCKHANDLE ArmSocket, Pose pose);
     ///
     /// \brief Movep_CANFD 位姿不经规划，直接通过CANFD透传给机械臂
     /// \param ArmSocket socket句柄
@@ -837,12 +858,12 @@ public:
     ///              注意：目标位姿必须是机械臂当前工具坐标系相对于当前工作坐标系的位姿，
     ///                   用户在使用该指令前务必确保，否则目标位姿会出错！！
     /// \param v: 速度比例1~100，即规划速度和加速度占机械臂末端最大线速度和线加速度的百分比
-    /// \param r: 轨迹交融半径，目前默认0。
+    /// \param r: 交融半径百分比系数， 0~100。
     /// \param trajectory_connect：代表是否和下一条运动一起规划，0代表立即规划，1代表和下一条轨迹一起规划，当为1时，轨迹不会立即执行
     /// \param block: RM_NONBLOCK-非阻塞，发送后立即返回；RM_BLOCK-阻塞，等待机械臂到达位置或者规划失败
     /// \return 0-成功，失败返回:错误码, rm_define.h查询.
     ///
-    RM_SERVICESHARED_EXPORT int Service_Movej_P_Cmd(SOCKHANDLE ArmSocket, Pose pose, byte v, float r, int trajectory_connect, bool block);
+    RM_SERVICESHARED_EXPORT int Service_Movej_P_Cmd(SOCKHANDLE ArmSocket, Pose pose, byte v, byte r, int trajectory_connect, bool block);
 
     ///
     /// \brief Service_Joint_Teach_Cmd 关节示教
@@ -1282,9 +1303,35 @@ public:
     /// \return                             0-成功，失败返回:错误码, rm_define.h查询.
     ///
     RM_SERVICESHARED_EXPORT int Service_Start_Multi_Drag_Teach(SOCKHANDLE ArmSocket, int mode,int singular_wall,bool block);
-
     ///
-    /// \brief Set_Force_Postion            力位混合控制
+    /// \brief 开始复合模式拖动示教-新参数
+    /// \param ArmSocket                    socket句柄
+    /// \param teach_state 复合拖动示教参数
+    /// \return 0-成功，失败返回:错误码, rm_define.h查询.
+    /// \attention 失败的可能原因:
+    ///          - 当前机械臂非六维力版本（六维力拖动示教）。
+    ///          - 机械臂当前处于 IO 急停状态
+    ///          - 机械臂当前处于仿真模式
+    ///          - 输入参数有误
+    ///          - 使用六维力模式拖动示教时，当前已处于奇异区
+    ///
+    RM_SERVICESHARED_EXPORT int Service_Start_Multi_Drag_Teach_New(SOCKHANDLE ArmSocket,MultiDragTeach teach_state);
+    ///
+    /// \brief Service_Set_Drag_Teach_Sensitivity 设置电流环拖动示教灵敏度
+    /// \param ArmSocket                    socket句柄
+    /// \param grade 等级，0到100，表示0~100%，当设置为100时保持初始状态
+    /// \return 0-成功，失败返回:错误码, rm_define.h查询.
+    ///
+    RM_SERVICESHARED_EXPORT int Service_Set_Drag_Teach_Sensitivity(SOCKHANDLE ArmSocket, int grade);
+    ///
+    /// \brief Service_Get_Drag_Teach_Sensitivity 获取电流环拖动示教灵敏度
+    /// \param ArmSocket                    socket句柄
+    /// \param grade等级，0到100，表示0~100%，当设置为100时保持初始状态
+    /// \return 0-成功，失败返回:错误码, rm_define.h查询.
+    ///
+    RM_SERVICESHARED_EXPORT int Service_Get_Drag_Teach_Sensitivity(SOCKHANDLE ArmSocket, int *grade);
+    ///
+    /// \brief Service_Set_Force_Postion            力位混合控制
     /// \param ArmSocket                    socket句柄
     /// \param sensor                       0-一维力；1-六维力
     /// \param mode                         0-基坐标系力控；1-工具坐标系力控；
@@ -1295,7 +1342,13 @@ public:
     ///
     RM_SERVICESHARED_EXPORT int Service_Set_Force_Postion(SOCKHANDLE ArmSocket, int sensor, int mode,
                                                           int direction, int N, bool block);
-
+    ///
+    /// \brief Service_Set_Force_Postion_New            力位混合控制-新参数
+    /// \param ArmSocket                    socket句柄
+    /// \param param                        力位混合控制参数
+    /// \return                             0-成功，失败返回:错误码, rm_define.h查询.
+    ///
+    RM_SERVICESHARED_EXPORT int Service_Set_Force_Postion_New(SOCKHANDLE ArmSocket, ForcePosition param);
     ///
     /// \brief Service_Stop_Force_Postion   结束力位混合控制
     /// \param ArmSocket socket句柄
@@ -1303,7 +1356,6 @@ public:
     /// \return                             0-成功，失败返回:错误码, rm_define.h查询.
     ///
     RM_SERVICESHARED_EXPORT int Service_Stop_Force_Postion(SOCKHANDLE ArmSocket, bool block);
-
     ///
     /// \brief Service_Clear_Force_Data 将六维力数据清零，即后续获得的所有数据都是基于当前数据的偏移量
     /// \param ArmSocket socket句柄
@@ -1311,7 +1363,6 @@ public:
     /// \return 0-成功，失败返回:错误码, rm_define.h查询.
     ///
     RM_SERVICESHARED_EXPORT int Service_Clear_Force_Data(SOCKHANDLE ArmSocket, bool block);
-
     ///
     /// \brief Service_Get_Force_Data 查询当前六维力传感器得到的力和力矩信息，若要周期获取力数据
     ///                               周期不能小于50ms。
@@ -1755,6 +1806,13 @@ public:
                                                                   byte mode, int dir, float force, bool follow);
 
     ///
+    /// \brief Service_Force_Position_Move          透传力位混合补偿-新参数
+    /// \param ArmSocket                    socket句柄
+    /// \param param                         透传力位混合补偿参数
+    /// \return                             0-成功，失败返回:错误码, rm_define.h查询.
+    ///
+    RM_SERVICESHARED_EXPORT int Service_Force_Position_Move(SOCKHANDLE ArmSocket, ForcePositionMove param);
+    ///
     /// \brief Service_Stop_Force_Position_Move     停止透传力位混合控制补偿模式
     /// \param ArmSocket                    socket句柄
     /// \param block                        RM_NONBLOCK-非阻塞，发送后立即返回；RM_BLOCK-阻塞，等待控制器返回设置成功指令
@@ -1988,7 +2046,7 @@ public:
     /// \param io_mode                      0-通用输入模式，1-通用输出模式、2-输入开始功能复用模式、3-输入暂停功能复用模式、4-输入继续功能复用模式、5-输入急停功能复用模式、
     ///                                     6-输入进入电流环拖动复用模式、7-输入进入力只动位置拖动模式（六维力版本可配置）、8-输入进入力只动姿态拖动模式（六维力版本可配置）、
     ///                                     9-输入进入力位姿结合拖动复用模式（六维力版本可配置）、10-输入外部轴最大软限位复用模式（外部轴模式可配置）、
-    ///                                     11-输入外部轴最小软限位复用模式（外部轴模式可配置）
+    ///                                     11-输入外部轴最小软限位复用模式（外部轴模式可配置）、12-输入初始位姿功能复用模式、13-输出碰撞功能复用模式。
     /// \return                             0-成功，失败返回:错误码, rm_define.h查询.
     ///
     RM_SERVICESHARED_EXPORT int Service_Set_IO_Mode(SOCKHANDLE ArmSocket, byte io_num, byte io_mode);
@@ -2077,23 +2135,19 @@ public:
     ///
     /// \brief Service_Get_Realtime_Push            获取主动上报接口配置
     /// \param ArmSocket                    socket句柄
-    /// \param cycle                        获取广播周期，为5ms的倍数
-    /// \param port                         获取广播的端口号
-    /// \param enable                       获取使能，是否使能主动上上报
-    /// \param force_coordinate             获取系统外受力数据的坐标系(仅带有力传感器的机械臂支持)
-    /// \param ip                           获取自定义的上报目标IP地址
+    /// \param config                       获取到的主动上报接口配置
+    /// \return                             0-成功，失败返回:错误码, rm_define.h查询.
     ///
-    RM_SERVICESHARED_EXPORT int Service_Get_Realtime_Push(SOCKHANDLE ArmSocket, int* cycle, int* port, bool* enable, int* force_coordinate, char* ip);
+    RM_SERVICESHARED_EXPORT int Service_Get_Realtime_Push(SOCKHANDLE ArmSocket, std::shared_ptr<Realtime_Push_Config>& config);
+    RM_SERVICESHARED_EXPORT int Service_Get_Realtime_Push(SOCKHANDLE ArmSocket, Realtime_Push_Config *config);
 
     ///
     /// \brief Service_Set_Realtime_Push            设置主动上报接口配置
-    /// \param cycle                        设置广播周期，为5ms的倍数
-    /// \param port                         设置广播的端口号
-    /// \param enable                       设置使能，是否使能主动上上报
-    /// \param force_coordinate             设置系统外受力数据的坐标系(仅带有力传感器的机械臂支持)
-    /// \param ip                           设置自定义的上报目标IP地址
+    /// \param ArmSocket                    socket句柄
+    /// \param config                       主动上报接口配置
+    /// \return                             0-成功，失败返回:错误码, rm_define.h查询.
     ///
-    RM_SERVICESHARED_EXPORT int Service_Set_Realtime_Push(SOCKHANDLE ArmSocket, int cycle, int port, bool enable, int force_coordinate, const char* ip);
+    RM_SERVICESHARED_EXPORT int Service_Set_Realtime_Push(SOCKHANDLE ArmSocket, Realtime_Push_Config config);
 
     ///
     /// \brief Service_Realtime_Arm_Joint_State     机械臂状态主动上报
@@ -2393,9 +2447,15 @@ public:
     /// \return Pose                    目标位姿
     ///
     RM_SERVICESHARED_EXPORT Pose Service_Algo_Forward_Kinematics(const float* const joint);
+    ///
+    /// \brief Algo_Set_Redundant_Parameter_Traversal_Mode 设置逆解求解模式
+    /// \param mode true：遍历模式，冗余参数遍历的求解策略。适于当前位姿跟要求解的位姿差别特别大的应用场景，如MOVJ_P、位姿编辑等，耗时较长
+    ///             false：单步模式，自动调整冗余参数的求解策略。适于当前位姿跟要求解的位姿差别特别小、连续周期控制的场景，如笛卡尔空间规划的位姿求解等，耗时短
+    ///
+    RM_SERVICESHARED_EXPORT void Service_Algo_Set_Redundant_Parameter_Traversal_Mode(bool mode);
 
     ///
-    /// \brief Algo_Inverse_Kinematics  逆解函数
+    /// \brief Algo_Inverse_Kinematics  逆解函数，默认单步模式，可使用Algo_Set_Redundant_Parameter_Traversal_Mode接口设置逆解求解模式
     /// \param q_in                     上一时刻关节角度 单位°
     /// \param q_pose                   目标位姿
     /// \param q_out                    输出的关节角度 单位°
@@ -2413,12 +2473,21 @@ public:
     RM_SERVICESHARED_EXPORT int Service_Algo_Inverse_Kinematics_Wrap(const IK_Params* params);
 
     ///
-    /// \brief  Algo_RotateMove         计算环绕运动位姿
-    /// \param  curr_joint              当前关节角度 单位°
-    /// \param  rotate_axis             旋转轴: 1:x轴, 2:y轴, 3:z轴
-    /// \param  rotate_angle            旋转角度: 旋转角度, 单位(度)
-    /// \param  choose_axis             指定计算时使用的坐标系
-    /// \return Pose                    计算位姿结果
+    /// \brief Service_Algo_PoseMove 计算Pos和Rot沿某坐标系有一定的位移和旋转角度后，所得到的位姿数据
+    /// \param poseCurrent 当前位姿，输入position和euler
+    /// \param deltaPosAndRot 沿轴位移和绕轴旋转数组（dx，dy，dz，rotx, roty, rotz），位置移动单位：m，旋转单位：度
+    /// \param frameMode 坐标系模式选择，0：计算相对于工作坐标系平移、旋转后的位姿，当工作坐标系为0时，即为计算相对基坐标系的位姿；
+    ///                               1：计算相对于工具坐标系平移、旋转后的位姿
+    /// \return Pose 经平移、旋转后的位姿
+    RM_SERVICESHARED_EXPORT Pose Service_Algo_PoseMove(Pose poseCurrent, const float *deltaPosAndRot, int frameMode);
+
+    ///
+    /// \brief  计算环绕运动位姿
+    /// \param  curr_joint 当前关节角度，unit:deg
+    /// \param  rotate_axis 旋转轴：1：x轴  2：y轴   3：z轴
+    /// \param  rotate_angle 旋转角度，unit:deg
+    /// \param  choose_axis 指定计算时使用的坐标系
+    /// \return Pose 计算位姿结果
     RM_SERVICESHARED_EXPORT Pose Service_Algo_RotateMove(const float* const curr_joint, int rotate_axis,
                                                          float rotate_angle, Pose choose_axis);
 
@@ -2451,54 +2520,54 @@ public:
     RM_SERVICESHARED_EXPORT Quat Service_Algo_Euler2Quaternion(Euler eu);
 
     ///
-    /// \brief  Algo_Euler2Matrix       欧拉角转旋转矩阵
-    /// \param  eu                      欧拉角
-    /// \return Matrix                  旋转矩阵
+    /// \brief  欧拉角rx,ry,rz 转换成旋转矩阵（3*3）
+    /// \param  _rot3 输入欧拉角
+    /// \return Matrix （3*3）旋转矩阵
     ///
-    RM_SERVICESHARED_EXPORT Matrix Service_Algo_Euler2Matrix(Euler eu,float data[4][4]);
-    RM_SERVICESHARED_EXPORT Matrix Service_Algo_Euler2Matrix(Euler eu);
+    RM_SERVICESHARED_EXPORT Matrix Service_Algo_Euler2Matrix(Euler _rot3,float data[4][4]);
+    RM_SERVICESHARED_EXPORT Matrix Service_Algo_Euler2Matrix(Euler _rot3);
 
     ///
-    /// \brief  Algo_Pos2Matrix         位姿转旋转矩阵
-    /// \param  state                   位姿
-    /// \return Matrix                  旋转矩阵
+    /// \brief  位姿转旋转矩阵
+    /// \param  _point 位姿（xyz + rx ry rz)
+    /// \return Matrix 旋转矩阵(4*4)
     ///
-    RM_SERVICESHARED_EXPORT Matrix Service_Algo_Pos2Matrix(Pose state,float data[4][4]);
-    RM_SERVICESHARED_EXPORT Matrix Service_Algo_Pos2Matrix(Pose state);
+    RM_SERVICESHARED_EXPORT Matrix Service_Algo_Pos2Matrix(Pose _point,float data[4][4]);
+    RM_SERVICESHARED_EXPORT Matrix Service_Algo_Pos2Matrix(Pose _point);
 
     ///
-    /// \brief  Algo_Matrix2Pos         旋转矩阵转位姿
-    /// \param  matrix                  旋转矩阵
-    /// \return Pose                    位姿
+    /// \brief  矩阵转位姿
+    /// \param  _matPos 位姿的齐次变换矩阵
+    /// \return Pose 位姿（pose+euler+quaternion）
     ///
-    RM_SERVICESHARED_EXPORT Pose Service_Algo_Matrix2Pos(Matrix matrix,float data[4][4]);
-    RM_SERVICESHARED_EXPORT Pose Service_Algo_Matrix2Pos(Matrix matrix);
+    RM_SERVICESHARED_EXPORT Pose Service_Algo_Matrix2Pos(Matrix _matPos,float data[4][4]);
+    RM_SERVICESHARED_EXPORT Pose Service_Algo_Matrix2Pos(Matrix _matPos);
 
     ///
-    /// \brief  Algo_Base2WorkFrame     基坐标系转工作坐标系
-    /// \param  matrix                  工作坐标系在基坐标系下的矩阵
-    /// \param  state                   工具端坐标在基坐标系下位姿
-    /// \return Pose                    基坐标系在工作坐标系下的位姿
+    /// \brief  基坐标系位姿转工作坐标系位姿
+    /// \param  matWork2Base 工作坐标系矩阵
+    /// \param  poseBase 基坐标系下的位姿
+    /// \return Pose 工作坐标系下的位姿
     ///
-    RM_SERVICESHARED_EXPORT Pose Service_Algo_Base2WorkFrame(Matrix matrix,float data[4][4], Pose state);
-    RM_SERVICESHARED_EXPORT Pose Service_Algo_Base2WorkFrame(Matrix matrix, Pose state);
+    RM_SERVICESHARED_EXPORT Pose Service_Algo_Base2WorkFrame(Matrix matWork2Base,float data[4][4], Pose poseBase);
+    RM_SERVICESHARED_EXPORT Pose Service_Algo_Base2WorkFrame(Matrix matWork2Base, Pose poseBase);
 
     ///
-    /// \brief  Algo_WorkFrame2Base     工作坐标系转基坐标系
-    /// \param  matrix                  工作坐标系在基坐标系下的矩阵
-    /// \param  state                   工具端坐标在工作坐标系下位姿
-    /// \return Pose                    工作坐标系在基坐标系下的位姿
+    /// \brief  工作坐标系位姿转基坐标系位姿
+    /// \param  matWork2Base 工作坐标系矩阵
+    /// \param  poseBase 工作坐标系下的位姿
+    /// \return Pose 基坐标系下的位姿
     ///
-    RM_SERVICESHARED_EXPORT Pose Service_Algo_WorkFrame2Base(Matrix matrix,float data[4][4], Pose state);
-    RM_SERVICESHARED_EXPORT Pose Service_Algo_WorkFrame2Base(Matrix matrix, Pose state);
+    RM_SERVICESHARED_EXPORT Pose Service_Algo_WorkFrame2Base(Matrix matWork2Base,float data[4][4], Pose poseBase);
+    RM_SERVICESHARED_EXPORT Pose Service_Algo_WorkFrame2Base(Matrix matWork2Base, Pose poseBase);
 
     ///
-    /// \brief  Algo_Cartesian_Tool     计算沿工具坐标系运动位姿
-    /// \param  curr_joint              当前关节角度
-    /// \param  move_lengthx            沿X轴移动长度，米为单位
-    /// \param  move_lengthy            沿Y轴移动长度，米为单位
-    /// \param  move_lengthz            沿Z轴移动长度，米为单位
-    /// \return Pose                    工作坐标系下的位姿
+    /// \brief  计算沿工具坐标系运动位姿
+    /// \param  curr_joint 当前关节角度，unit:deg
+    /// \param  move_lengthx 沿 X 轴移动长度，unit:m
+    /// \param  move_lengthy 沿 Y 轴移动长度，unit:m
+    /// \param  move_lengthz 沿 Z 轴移动长度，unit:m
+    /// \return Pose 工作坐标系下的机械臂末端位姿
     ///
     RM_SERVICESHARED_EXPORT Pose Service_Algo_Cartesian_Tool(const float* const curr_joint, float move_lengthx,
                                                              float move_lengthy, float move_lengthz);
@@ -2507,7 +2576,7 @@ public:
     /// \brief Algo_Set_WorkFrame       设置工作坐标系
     /// \param coord_work               坐标系数据
     ///
-    RM_SERVICESHARED_EXPORT void Service_Algo_Set_WorkFrame(const FRAME* const coord_work);
+    RM_SERVICESHARED_EXPORT void Service_Algo_Set_WorkFrame(const FRAME* coord_work);
 
     ///
     /// \brief  Algo_Get_Curr_WorkFrame 获取当前工作坐标系
@@ -2520,7 +2589,7 @@ public:
     /// \brief Algo_Set_ToolFrame       设置工具坐标系
     /// \param coord_tool               坐标系数据
     ///
-    RM_SERVICESHARED_EXPORT void Service_Algo_Set_ToolFrame(const FRAME* const coord_tool);
+    RM_SERVICESHARED_EXPORT void Service_Algo_Set_ToolFrame(const FRAME* coord_tool);
 
     ///
     /// \brief  Algo_Get_Curr_ToolFrame 获取当前工具坐标系
