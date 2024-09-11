@@ -265,6 +265,7 @@ Rm_Control::Rm_Control(std::string name) : Node(name)
     {
         joint_msg.joint.resize(7);
         joint_msg.dof = 7;
+        arm_type_ = 75;
     }
     else
     {

@@ -39,13 +39,13 @@ rm_gazebo的主要作用为帮助我们实现机械臂Moveit2规划的仿真功�
 ```
 rm@rm-desktop:~$ ros2 launch rm_gazebo gazebo_<arm_type>_demo.launch.py
 ```
-在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、75、gen72，运行成功后将弹出如下界面。  
+在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、eco63、75、gen72，运行成功后将弹出如下界面。  
 ![image](doc/rm_gazebo1.png)
 之后我们使用如下指令启动moveit2控制gazebo中的仿真机械臂。
 ```
 rm@rm-desktop:~$ ros2 launch rm_<arm_type>_config gazebo_moveit_demo.launch.py
 ```
-在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、75、gen72，运行成功后弹出rviz2的控制界面后就可以进行moveit2和gazebo的仿真控制了。
+在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、eco63、75、gen72，运行成功后弹出rviz2的控制界面后就可以进行moveit2和gazebo的仿真控制了。
 ![image](doc/rm_gazebo2.png)
 ## rm_gazebo功能包架构说明
 ### 功能包文件总览
@@ -57,6 +57,7 @@ rm@rm-desktop:~$ ros2 launch rm_<arm_type>_config gazebo_moveit_demo.launch.py
 │   ├── gazebo_65_description.urdf.xacro     #RM65gazebo模型描述文件
 │   ├── gazebo_75_description.urdf.xacro     #RM75gazebo模型描述文件
 │   ├── gazebo_eco65_description.urdf.xacro  #ECO65gazebo模型描述文件
+│   ├── gazebo_eco63_description.urdf.xacro  #ECO63gazebo模型描述文件
 │   └── gazebo_gen72_description.urdf.xacro  #GEN72gazebo模型描述文件
 ├── doc
 │   ├── rm_gazebo1.png
@@ -68,6 +69,7 @@ rm@rm-desktop:~$ ros2 launch rm_<arm_type>_config gazebo_moveit_demo.launch.py
 │   ├── gazebo_65_demo.launch.py             #RM65gazebo启动文件
 │   ├── gazebo_75_demo.launch.py             #RM75gazebo启动文件
 │   ├── gazebo_eco65_demo.launch.py          #ECO65gazebo启动文件
+│   ├── gazebo_eco63_demo.launch.py          #ECO63gazebo启动文件
 │   └── gazebo_gen72_demo.launch.py          #GEN72gazebo启动文件
 ├── package.xml
 ├── README_CN.md

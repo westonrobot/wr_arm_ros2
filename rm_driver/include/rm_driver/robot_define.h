@@ -21,12 +21,11 @@ typedef float MAT3X2[3][2];
 typedef float MAT3X3[3][3];
 typedef float MAT3X6[3][6];
 typedef float MAT4X4[4][4];
-typedef float MAT8X3[8][3];
-typedef float MAT16X3[16][3];
-typedef float MAT20X3[20][3];
 typedef float MAT6X6[6][6];
 typedef float MAT6X7[6][7];
 typedef float MAT7X6[7][6];
+typedef float MAT8X3[8][3];
+typedef float MAT20X3[20][3];
 typedef float VEC3[3];
 typedef float VEC4[4];
 typedef float VEC6[6];
@@ -34,6 +33,7 @@ typedef float VEC7[7];
 typedef float VEC8[8];
 typedef float VEC16[16];
 typedef float VEC20[20];
+typedef int VEC6_int[6];
 typedef int VEC8_int[8];
 typedef int VEC16_int[16];
 typedef int VEC20_int[20];
@@ -211,8 +211,10 @@ typedef enum
 
 typedef enum
 {
-    fence_succeed = 0,     //电子围栏设置成功
-    fence_failed = 1       //电子围栏设置失败
+    fence_succeed = 0,      //电子围栏设置成功
+    fence_failed = 1,       //电子围栏设置失败
+    Not_cubiod = 2,         //输入参数无法构成长方体  
+    Not_plane = 3,          //输入参数无法构成平面      
 } IsFenceSucceed;
 typedef struct 
 {
@@ -224,7 +226,7 @@ typedef struct
 typedef struct 
 {
     SafeFenceType _fence_type;      // 围栏类型  
-    MAT3X2 cuboid_data;              // 立方体数据cuboid_data[0][0-1]:xmin xmax,cuboid_data[1][0-1]:ymin ymax,cuboid_data[2][0-1]:zmin zmax
+    MAT3X2 cuboid_data;              // 长方体数据cuboid_data[0][0-1]:xmin xmax,cuboid_data[1][0-1]:ymin ymax,cuboid_data[2][0-1]:zmin zmax
     Pos single_Pdata[3];            // 单面围栏数据 [0][1][2]为平面上任意3点坐标
     IsInsideFence _is_insidefence;  // 机械臂是否在围栏内（0：在围栏内，1：在围栏外）
     int _is_robot_or_tcp;           // 整臂or末端
@@ -241,6 +243,7 @@ typedef enum
     ECO65,
     ECO62,
     GEN72,
+    ECO63,
     UNIVERSAL
 } RobotType;
 

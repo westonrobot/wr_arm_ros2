@@ -1,12 +1,12 @@
 <div align="right">
 
-[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_bringup/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_bringup/README.md)
+[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_bringup/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_bringup/README.md)
  
 </div>
 
 <div align="center">
 
-# RealMan Robot rm_bringup User Manual V1.1
+# RealMan Robot rm_bringup User Manual V1.2
 
 RealMan Intelligent Technology (Beijing) Co., Ltd. 
 
@@ -16,6 +16,7 @@ Revision History:
 | :---: | :----: | :---:   |
 |V1.0	  | 2/19/2024 | Draft |
 |V1.1	  | 7/8 /2024 | Amend(Add GEN72 adapter files) |
+|V1.2 	  | 9/10 /2024| Amend(Add ECO63 adapter files) |
 
 </div>
 
@@ -44,7 +45,7 @@ First, after configuring the environment and completing the connection, we can d
 ```
 rm@rm-desktop:~$ ros2 launch rm_bringup rm_<arm_type>_bringup.launch.py
 ```
-In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65, 75 and gen72.  
+In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65、eco63, 75 and gen72.  
 For example, the launch command of 65 robotic arm:
 ```
 rm@rm-desktop:~$ ros2 launch rm_bringup rm_65_bringup.launch.py
@@ -57,7 +58,7 @@ We can run the launch.py file in the rm_bringup package through the following co
 ```
 rm@rm-desktop:~$ ros2 launch rm_bringup rm_<arm_type>_gazebo.launch.py
 ```
-In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65, 75, and gen72.  
+In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65、eco63, 75, and gen72.  
 For example, the launch command of 65 robotic arm:
 ```
 rm@rm-desktop:~$ ros2 launch rm_bringup rm_65_gazebo.launch.py
@@ -84,6 +85,8 @@ The current rm_driver package is composed of the following files.
 │   ├── rm_75_gazebo.launch.py         # 75 arm gazebo launch file
 │   ├── rm_eco65_bringup.launch.py     # eco65 arm moveit2 launch file
 │   ├── rm_eco65_gazebo.launch.py      # eco65 arm gazebo launch file
+│   ├── rm_eco63_bringup.launch.py     # eco63 arm moveit2 launch file
+│   ├── rm_eco63_gazebo.launch.py      # eco63 arm gazebo launch file
 │   ├── rm_gen72_bringup.launch.py     # gen72 arm moveit2 launch file
 │   └── rm_gen72_gazebo.launch.py      # gen72 arm gazebo launch file
 ├── package.xml

@@ -1,6 +1,6 @@
 <div align="right">
  
-[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_example/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_example/README.md)
+[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_example/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_example/README.md)
 
 </div>
 
@@ -50,8 +50,7 @@ rm_bringup功能包为实现了一些基本的机械臂功能，通过该功能�
 ```
 rm@rm-desktop:~$ ros2 launch rm_driver rm_<arm_type>_driver.launch.py
 ```
-在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、75。  
-例如65机械臂的启动命令：
+在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、eco63、
 ```
 rm@rm-desktop:~$ ros2 launch rm_driver rm_65_driver.launch.py
 ```
@@ -76,7 +75,7 @@ rm@rm-desktop:~$ ros2 topic pub --once /rm_driver/get_curr_workFrame_cmd std_msg
 ```
 rm@rm-desktop:~$ ros2 launch rm_driver rm_<arm_type>_driver.launch.py
 ```
-在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、75。  
+在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、eco63、75。  
 例如65机械臂的启动命令：
 ```
 rm@rm-desktop:~$ ros2 launch rm_driver rm_65_driver.launch.py
@@ -94,7 +93,7 @@ rm@rm-desktop:~$ ros2 run rm_example rm_get_state
 ```
 rm@rm-desktop:~$ ros2 launch rm_driver rm_<arm_type>_driver.launch.py
 ```
-在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、75。  
+在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、eco63、75。  
 例如65机械臂的启动命令：
 ```
 rm@rm-desktop:~$ ros2 launch rm_driver rm_65_driver.launch.py
@@ -116,7 +115,7 @@ rm@rm-desktop:~$ ros2 launch rm_example rm_7dof_movej.launch.py
 ```
 rm@rm-desktop:~$ ros2 launch rm_driver rm_<arm_type>_driver.launch.py
 ```
-在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、75、gen72。  
+在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、eco63、75、gen72。  
 例如65机械臂的启动命令：
 ```
 rm@rm-desktop:~$ ros2 launch rm_driver rm_65_driver.launch.py
@@ -137,7 +136,7 @@ rm@rm-desktop:~$ ros2 run rm_example movejp_gen72_demo
 ```
 rm@rm-desktop:~$ ros2 launch rm_driver rm_<arm_type>_driver.launch.py
 ```
-在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、75、gen72。  
+在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、eco63、75、gen72。  
 例如65机械臂的启动命令：
 ```
 rm@rm-desktop:~$ ros2 launch rm_driver rm_65_driver.launch.py

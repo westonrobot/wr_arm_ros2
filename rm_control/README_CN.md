@@ -1,12 +1,12 @@
 <div align="right">
  
-[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_control/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_control/README.md)
+[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_control/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_control/README.md)
 
 </div>
 
 <div align="center">
 
-# 睿尔曼机器人rm_control使用说明书V1.1
+# 睿尔曼机器人rm_control使用说明书V1.2
  
 睿尔曼智能科技（北京）有限公司 
 文件修订记录：
@@ -15,6 +15,7 @@
 | :---: | :-----: | :---: |
 |V1.0    |2024-2-19  |拟制 |
 |V1.1    |2024-7-3   |修订(添加GEN72相关适配文件) |
+|V1.2    |2024-9-10  |修订(添加ECO63相关适配文件) |
 
 </div>
 
@@ -42,7 +43,7 @@ rm_control功能包为实现moveit2控制真实机械臂时所必须的一个功
 ```
 rm@rm-desktop:~$ ros2 launch  rm_control rm_<arm_type>_control.launch.py
 ```
-在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、75、gen72。
+在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、eco63、75、gen72。
 例如65机械臂的启动命令：
 ```
 rm@rm-desktop:~$ ros2 launch  rm_control rm_65_control.launch.py
@@ -55,7 +56,7 @@ rm@rm-desktop:~$ ros2 launch  rm_control rm_65_control.launch.py
 ![image](doc/rm_control2.png)
 如上图所示第一个红框框出的位置为文件的路径，第二个框出的位置为当前可配置的参数。  
 参数follow：代表当前透传使用的跟随模式，true:高跟随，false:低跟随。高跟随即机械臂运动方式与透传完全一致，需要根据透传的速率和机械臂的速度、加速度参数进行较详细的计算，使用门槛较高，但控制精细。低跟随即机械臂会基本根据透传速率和速度、加速度向透传点运动，若有来不及到达的点可能会有丢弃现象发生，使用门槛低，控制不太精细，但基本满足使用。  
-参数arm_type：代表当前使用的机械臂型号，可以选择的参数有65（RM65系列）、651（ECO65系列）、632（63系列）、75（75系列）72（GEN72系列）。  
+参数arm_type：代表当前使用的机械臂型号，可以选择的参数有65（RM65系列）、651（ECO65系列）、634（ECO63系列）、632（63系列）、75（75系列）72（GEN72系列）。  
 再实际使用时，我们选择对应的launch文件启动时会自动选择正确的型号，若有特殊要求可在此处进行相应的参数修改，修改之后需要在工作空间目录下进行重新编译，之后修改的配置才会生效。  
 在工作空间目录运行colcon build指令。
 ```
@@ -78,6 +79,7 @@ rm@rm-desktop: ~/ros2_ws$ colcon build
 │   ├── rm_65_control.launch.py     #65启动文件
 │   ├── rm_75_control.launch.py     #75启动文件
 │   ├── rm_eco65_control.launch.py  #eco65启动文件
+│   ├── rm_eco63_control.launch.py  #eco63启动文件
 │   └── rm_gen72_control.launch.py  #gen72启动文件
 ├── package.xml                     #依赖声明文件
 ├── README_CN.md

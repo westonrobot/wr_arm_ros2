@@ -1,12 +1,12 @@
 <div align="right">
 
-[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_description/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_description/README.md)
+[简体中文](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_description/README_CN.md)|[English](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_description/README.md)
  
 </div>
 
 <div align="center">
 
-# RealMan Robot rm_description User Manual V1.1
+# RealMan Robot rm_description User Manual V1.2
 
 RealMan Intelligent Technology (Beijing) Co., Ltd. 
 
@@ -16,6 +16,7 @@ Revision History:
 | :---: | :----: | :---:   |
 |V1.0	  | 2/19/2024 | Draft |
 |V1.1	  | 7/8 /2024 | Amend(Add GEN72 adapter files) |
+|V1.2	  | 9/11 /2024| Amend(Add ECO63 adapter files) |
 
 </div>
 
@@ -72,6 +73,7 @@ The current rm_driver package is composed of the following files.
 │   ├── rm_65_display.launch.py     # 65 launch file
 │   ├── rm_75_display.launch.py     # 75 launch file
 │   ├── rm_eco65_display.launch.py  # eco65 launch file
+│   ├── rm_eco63_display.launch.py  # eco63 launch file
 │   └── rm_gen72_display.launch.py  # gen72 launch file
 ├── meshes                       # model file storage folder
 │   ├── rm_63_arm                 #63 robotic arm model file storage folder
@@ -107,6 +109,14 @@ The current rm_driver package is composed of the following files.
 │   │   ├── Link4.STL
 │   │   ├── Link5.STL
 │   │   └── Link6.STL
+│   └── rm_eco63_arm                 #eco63 robotic arm model file storage folder
+│   │   ├── baselink.STL
+│   │   ├── Link1.STL
+│   │   ├── Link2.STL
+│   │   ├── Link3.STL
+│   │   ├── Link4.STL
+│   │   ├── Link5.STL
+│   │   └── Link6.STL
 │   └── rm_gen72_arm                 #gen72 robotic arm model file storage folder
 │       ├── base_link.STL
 │       ├── Link1.STL
@@ -124,6 +134,7 @@ The current rm_driver package is composed of the following files.
 │   ├── rm_65.rviz
 │   ├── rm_75.rviz
 │   └── rm_eco65.rviz
+│   └── rm_eco63.rviz
 │   └── rm_gen72.rviz
 ├── textures
 └── urdf
@@ -137,6 +148,9 @@ The current rm_driver package is composed of the following files.
     ├── rm_eco65.csv
     ├── rm_eco65_gazebo.urdf            #eco65gazebo simulation urdf description file
     ├── rm_eco65.urdf                   #eco65 urdf description file
+    ├── rm_eco63.csv
+    ├── rm_eco63_gazebo.urdf            #eco63gazebo simulation urdf description file
+    ├── rm_eco63.urdf                   #eco63 urdf description file
     ├── rm_gen72.csv
     ├── rm_gen72_gazebo.urdf            #gen72gazebo simulation urdf description file
     ├── rm_gen72.urdf                   #gen72 urdf description file
