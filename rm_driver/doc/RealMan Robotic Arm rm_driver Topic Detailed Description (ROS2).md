@@ -7,7 +7,7 @@
 
 <div align="center">
 
-# RealMan Robotic Arm rm_driver Topic Detailed Description (ROS2) V1.1.1
+# RealMan Robotic Arm rm_driver Topic Detailed Description (ROS2) V1.1.2
 
 
  
@@ -22,6 +22,7 @@ Revision History:
 |V1.0 | 2024-2-18 | Draft |
 |V1.1 | 2024-7-8  | Amend(Add teaching instructions3.6) |
 |V1.1.1| 2024-8-13| Amend(Add six-axis topic)           |
+|V1.1.2| 2024-9-25| Amend(revise coordinate topic description)|
 
 </div>
 
@@ -390,8 +391,7 @@ The RealMan RM-65 robotic arm has been equipped with a five-finger dexterous han
 | Function description | Set the dexterous hand action sequence number |
 | :---: | :---- |
 | Parameter description | Handseq.msg<br>uint16 seq_num：the serial number of the action sequence pre-saved in the dexterous hand, ranging from 1 to 40.<br>bool data: whether it is a blocking mode, bool type, true: blocking, false: non-blocking. |
-| Command example | ros2 topic pub --once /rm_driver/set_hand_seq_cmd rm_ros_interfaces/msg/Handseq "seq_num: 1
-block: true" |
+| Command example | ros2 topic pub --once /rm_driver/set_hand_seq_cmd rm_ros_interfaces/msg/Handseq "seq_num: 1<br>block: true" |
 | Return value | Successful return: true; failure returns: false, the driver terminal returns an error code. |
 | Return example | ros2 topic echo /rm_driver/set_hand_seq_result |
 #### Setting_the_angles_of_various_degrees_of_freedom_for_the_dexterous_hand
