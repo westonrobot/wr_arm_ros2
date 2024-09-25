@@ -7,7 +7,7 @@
 
 <div align="center">
 
-# 睿尔曼机械臂接口函数说明(ROS2)V1.1.1
+# 睿尔曼机械臂接口函数说明(ROS2)V1.1.2
 
 
  
@@ -22,6 +22,7 @@
 |V1.0 | 2024-2-18 | 拟制|
 |V1.1 | 2024-7-8  | 修订（添加示教指令3.6） |
 |V1.1.1| 2024-8-13| 修订（添加查询六维力数据）|
+|V1.1.2| 2024-9-25| 修订（修正坐标系话题描述错误）|
 
 </div>
 
@@ -392,8 +393,7 @@
 | 功能描述 | 设置灵巧手动作序列 |
 | :---: | :---- |
 | 参数说明 | Handseq.msg<br>uint16 seq_num：预先保存在灵巧手内的序列序号，范围：1~40。<br>bool data：是否为阻塞模式，true:阻塞，false:非阻塞。 |
-| 命令示例 | ros2 topic pub --once /rm_driver/set_hand_seq_cmd rm_ros_interfaces/msg/Handseq "seq_num: 1
-block: true" |
+| 命令示例 | ros2 topic pub --once /rm_driver/set_hand_seq_cmd rm_ros_interfaces/msg/Handseq "seq_num: 1<br>block: true" |
 | 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
 | 返回查询示例 | ros2 topic echo /rm_driver/set_hand_seq_result |
 #### 设置灵巧手各自由度角度
