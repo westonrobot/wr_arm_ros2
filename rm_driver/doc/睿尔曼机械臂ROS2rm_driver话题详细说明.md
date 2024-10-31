@@ -78,6 +78,8 @@
 * 3.12.3[设置灵巧手各自由度角度](#设置灵巧手各自由度角度)
 * 3.12.4[设置灵巧手速度](#设置灵巧手速度)
 * 3.12.5[设置灵巧手力阈值](#设置灵巧手力阈值)
+* 3.12.6[设置灵巧手角度跟随](#设置灵巧手角度跟随)
+* 3.12.7[设置灵巧手姿态跟随](#设置灵巧手姿态跟随)
 * 3.13[升降机构](#升降机构)
 * 3.13.1[升降机构速度开环控制](#升降机构速度开环控制)
 * 3.13.2[升降机构位置闭环控制](#升降机构位置闭环控制)
@@ -416,6 +418,20 @@
 | 命令示例 | ros2 topic pub --once /rm_driver/set_hand_force_cmd rm_ros_interfaces/msg/Handforce "hand_force: 200<br>block: true" |
 | 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
 | 返回查询示例 | ros2 topic echo /rm_driver/set_hand_force_result |
+#### 设置灵巧手角度跟随
+| 功能描述 | 设置灵巧手角度跟随 |
+| :---: | :---- |
+| 参数说明 | Handangle.msg<br>int16[6] hand_angle：手指角度数组，范围(根据实际设备属性，以下为因时参考)：0~2000.另外，-1 代表该自由度不执行任何操作，保持当前状态。<br>bool data：是否为阻塞模式，true:阻塞，false:非阻塞。 |
+| 命令示例 | ros2 topic pub --once /rm_driver/set_hand_follow_angle_cmd rm_ros_interfaces/msg/Handangle "hand_angle:<br>- 0<br>- 0<br>- 0<br>- 0<br>- 0<br>- 0<br>block: true" |
+| 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
+| 返回查询示例 | ros2 topic echo /rm_driver/set_hand_follow_angle_result |
+#### 设置灵巧手姿态跟随
+| 功能描述 | 设置灵巧手姿态跟随 |
+| :---: | :---- |
+| 参数说明 | Handangle.msg<br>int16[6] hand_angle：手指姿态数组，范围(根据实际设备属性，以下为因时参考)：0~1000.另外，-1 代表该自由度不执行任何操作，保持当前状态。<br>bool data：是否为阻塞模式，true:阻塞，false:非阻塞。 |
+| 命令示例 | ros2 topic pub --once /rm_driver/set_hand_follow_pos_cmd rm_ros_interfaces/msg/Handangle "hand_angle:<br>- 0<br>- 0<br>- 0<br>- 0<br>- 0<br>- 0<br>block: true" |
+| 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
+| 返回查询示例 | ros2 topic echo /rm_driver/set_hand_follow_pos_result |
 ### 升降机构
 睿尔曼机械臂可集成自主研发升降机构。
 #### 升降机构速度开环控制
@@ -555,3 +571,9 @@
 | 参数说明 | std_msgs::msg::UInt16<br>uint16 data：系统外受力数据的坐标系，0 为传感器坐标系 1 为当前工作坐标系 2 为当前工具坐标系。该数据会影响一维力和六维力传感器系统外受力数据的参考坐标系 |
 | 查询示例 | ros2 topic echo /rm_driver/udp_arm_coordinate |
 
+* 灵巧手力当前状态
+
+| 功能描述 | 获取灵巧手力当前状态 |
+| :----: | :---- |
+| 参数说明 | rm_ros_interfaces::msg::Handstatus.msg<br>uint16[6] hand_angle：#手指角度数组，范围：0~2000.<br>uint16[6] hand_pos：#手指位置数组，范围：0~1000.<br>uint16[6] hand_state：#手指状态,0正在松开，1正在抓取，2位置到位停止，3力到位停止，5电流保护停止，6电缸堵转停止，7电缸故障停止.<br>uint16[6] hand_force：#灵巧手自由度电流，单位mN.<br>uint16  hand_err：#灵巧手系统错误，1表示有错误，0表示无错误. |
+| 查询示例 | ros2 topic echo /rm_driver/udp_hand_status |

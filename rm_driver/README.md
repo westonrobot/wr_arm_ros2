@@ -6,7 +6,7 @@
 
 <div align="center">
 
-# RealMan Robot rm_driver User Manual V1.2
+# RealMan Robot rm_driver User Manual V1.2.1
 
 RealMan Intelligent Technology (Beijing) Co., Ltd. 
 
@@ -14,9 +14,10 @@ Revision History:
 
 |No.	  | Date   |	Comment |
 | :---: | :----: | :---:   |
-|V1.0	  | 2/7/2024 | Draft |
-|V1.1	  | 7/8/2024 | Amend（Add GEN72 adapter files） |
-|V1.2	  | 9/10/2024| Amend（Add ECO63 adapter files） |
+|V1.0	  | 2/7/2024  | Draft |
+|V1.1	  | 7/8/2024  | Amend（Add GEN72 adapter files） |
+|V1.2	  | 9/10/2024 | Amend（Add ECO63 adapter files） |
+|V1.2.1 | 10/31/2024| Amend（Add dexterous hand udp topic） |
 
 </div>
 
