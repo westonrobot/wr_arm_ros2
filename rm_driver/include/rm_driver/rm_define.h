@@ -47,7 +47,7 @@ typedef SOCKET  SOCKHANDLE;
 typedef int SOCKHANDLE;
 #endif
 
-#define  SDK_VERSION (char*)"4.3.5"
+#define  SDK_VERSION (char*)"4.3.6.t2"
 
 typedef unsigned char byte;
 typedef unsigned short u16;
@@ -304,7 +304,7 @@ typedef struct {
 } ForceData;
 
 /***
- * 扩展关节数据
+ * udp推送扩展关节数据
  *
  */
 typedef struct {
@@ -317,7 +317,7 @@ typedef struct {
 } ExpandState;
 
 /***
- * 升降机构状态
+ * udp推送升降机构状态
  *
  */
 typedef struct {
@@ -329,16 +329,47 @@ typedef struct {
 } LiftState;
 
 /***
- * 灵巧手状态
+ * udp推送灵巧手状态
  *
  */
 typedef struct {
-    int hand_pos;         ///< 表示灵巧手自由度大小，0-1000，无量纲
-    float hand_force;            ///< 表示灵巧手自由度电流，单位mN
-    int hand_state;        ///< 表示灵巧手自由度状态
-    int hand_err;       ///< 表示灵巧手系统错误
+    int hand_pos[6];         ///< 表示灵巧手位置
+    int hand_angle[6];         ///< 表示灵巧手角度
+    int hand_force[6];            ///< 表示灵巧手自由度电流，单位mN
+    int hand_state[6];        ///< 表示灵巧手自由度状态
+    int hand_err;       ///< 表示灵巧手系统错误，由灵巧手厂商定义错误含义，例如因时状态码如下：1表示有错误，0表示无错误
 } HandState;
 
+
+/**
+ * @brief udp推送机械臂当前状态
+ *
+ */
+typedef enum {
+    RM_IDLE_E,                     // 使能但空闲状态
+    RM_MOVE_L_E,                   // move L运动中状态
+    RM_MOVE_J_E,                   // move J运动中状态
+    RM_MOVE_C_E,                   // move C运动中状态
+    RM_MOVE_S_E,                   // move S运动中状态
+    RM_MOVE_THROUGH_JOINT_E,       // 角度透传状态
+    RM_MOVE_THROUGH_POSE_E,        // 位姿透传状态
+    RM_MOVE_THROUGH_FORCE_POSE_E,  // 力控透传状态
+    RM_MOVE_THROUGH_CURRENT_E,     // 电流环透传状态
+    RM_STOP_E,                     // 急停状态
+    RM_SLOW_STOP_E,                // 缓停状态
+    RM_PAUSE_E,                    // 暂停状态
+    RM_CURRENT_DRAG_E,             // 电流环拖动状态
+    RM_SENSOR_DRAG_E,              // 六维力拖动状态
+    RM_TECH_DEMONSTRATION_E        // 示教状态
+} ArmCurrentStatus;
+/***
+ * aloha主臂状态
+ *
+ */
+typedef struct {
+    int io1_state;         ///<  IO1状态（手柄光电检测），0为按键未触发，1为按键触发。
+    int io2_state;        ///<  IO2状态（手柄光电检测），0为按键未触发，1为按键触发。
+} Alohastate;
 /**
  * UDP接口实时机械臂状态上报
  */
@@ -353,6 +384,8 @@ typedef struct {
     LiftState liftState;      ///< 升降关节数据
     ExpandState expandState;      ///< 扩展关节数据
     HandState handState;         ///< 灵巧手数据
+    ArmCurrentStatus arm_current_status;     ///< 机械臂状态
+    Alohastate aloha_state;     ///< aloha主臂状态
 } RobotStatus;
 
 
@@ -477,7 +510,7 @@ typedef struct {
     char project_path[300];      ///< 下发文件路径文件名
     int project_path_len;   ///< 名称长度
     int plan_speed;     ///< 规划速度比例系数
-    int only_save;      ///< 0-运行文件，1-仅保存文件，不运行
+    int only_save;      ///< 0-保存并运行文件，1-仅保存文件，不运行
     int save_id;        ///< 保存到控制器中的编号
     int step_flag;      ///< 设置单步运行方式模式，1-设置单步模式 0-设置正常运动模式
     int auto_start;     ///< 设置默认在线编程文件，1-设置默认  0-设置非默认
@@ -490,6 +523,8 @@ typedef struct
     int lift_state;    ///< 升降关节信息。1：上报；0：关闭上报；-1：不设置，保持之前的状态
     int expand_state;  ///< 扩展关节信息（升降关节和扩展关节为二选一，优先显示升降关节）1：上报；0：关闭上报；-1：不设置，保持之前的状态
     int hand_state;    ///< 灵巧手状态。1：上报；0：关闭上报；-1：不设置，保持之前的状态
+    int arm_current_status;    ///< 机械臂状态。1：上报；0：关闭上报；-1：不设置，保持之前的状态
+    int aloha_state;    ///< aloha主臂状态是否上报。1：上报；0：关闭上报；-1：不设置，保持之前的状态
 }UDP_Custom_Config;
 
 /**
@@ -525,7 +560,7 @@ typedef struct
     int sensor;            ///< 传感器，0-一维力；1-六维力
     int mode;              ///< 0-基坐标系力控；1-工具坐标系力控；
     int control_mode[6];       ///< 6个力控方向的模式 0-固定模式 1-浮动模式 2-弹簧模式 3-运动模式 4-力跟踪模式 5-浮动+运动模式 6-弹簧+运动模式 7-力跟踪+运动模式 8-姿态自适应模式
-    float desired_force[6];     ///< 力控轴维持的期望力/力矩，力控轴的力控模式为力跟踪模式时，期望力/力矩设置才会生效 ，精度0.1N。
+    float desired_force[6];     ///< 力控轴维持的期望力/力矩，力控轴的力控模式为力跟踪模式时，期望力/力矩设置才会生效 ，单位N。
     float limit_vel[6];     ///< 力控轴的最大线速度和最大角速度限制，只对开启力控方向生效。
 }ForcePosition;
 /**
@@ -544,6 +579,13 @@ typedef struct
     float desired_force[6];     ///< 力控轴维持的期望力/力矩，力控轴的力控模式为力跟踪模式时，期望力/力矩设置才会生效 ，精度0.1N。
     float limit_vel[6];     ///< 力控轴的最大线速度和最大角速度限制，只对开启力控方向生效。
 }ForcePositionMove;
+
+typedef struct{
+    float alpha;    //unit: deg
+    float a;        //unit: m
+    float d;        //unit: m
+    float offset;   //unit: deg
+}DHData;
 
 typedef void (*RobotStatusListener)(RobotStatus data);
 typedef void (*RM_Callback)(CallbackData data);

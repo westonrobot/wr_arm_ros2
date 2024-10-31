@@ -42,6 +42,7 @@ set(msg_files
   msg/Handposture.msg
   msg/Handseq.msg
   msg/Handspeed.msg
+  msg/Handstatus.msg
   msg/Armoriginalstate.msg
   msg/Armstate.msg
   msg/Liftspeed.msg

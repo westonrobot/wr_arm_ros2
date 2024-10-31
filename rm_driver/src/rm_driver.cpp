@@ -500,6 +500,8 @@ void RmArm::Arm_Get_Realtime_Push_Callback(const std_msgs::msg::Empty::SharedPtr
         Setrealtime_msg.port = config.port;
         Setrealtime_msg.force_coordinate = config.force_coordinate;
         Setrealtime_msg.ip = config.ip;
+        Setrealtime_msg.hand_enable = config.custom.hand_state;
+        udp_hand_g = config.custom.hand_state;
         this->Get_Realtime_Push_Result->publish(Setrealtime_msg);
     }
     else
@@ -518,7 +520,8 @@ void RmArm::Arm_Set_Realtime_Push_Callback(const rm_ros_interfaces::msg::Setreal
     strcpy(config.ip,msg->ip.data());
     UDP_Custom_Config config_enable;
     config_enable.expand_state = 0;
-    config_enable.hand_state = 0;
+    config_enable.hand_state = msg->hand_enable;
+    udp_hand_g = msg->hand_enable;
     config_enable.joint_speed = 0;
     config_enable.lift_state = 0;
     config.custom = config_enable;
@@ -536,7 +539,7 @@ void RmArm::Arm_Set_Realtime_Push_Callback(const rm_ros_interfaces::msg::Setreal
     }
 }
 
-void RmArm::Set_UDP_Configuration(int udp_cycle, int udp_port, int udp_force_coordinate, std::string udp_ip)
+void RmArm::Set_UDP_Configuration(int udp_cycle, int udp_port, int udp_force_coordinate, std::string udp_ip, bool hand)
 {
     u_int32_t res;
     Realtime_Push_Config config;
@@ -547,7 +550,8 @@ void RmArm::Set_UDP_Configuration(int udp_cycle, int udp_port, int udp_force_coo
     strcpy(config.ip,udp_ip.data());
     UDP_Custom_Config config_enable;
     config_enable.expand_state = 0;
-    config_enable.hand_state = 0;
+    config_enable.hand_state = hand;
+    udp_hand_g = hand;
     config_enable.joint_speed = 0;
     config_enable.lift_state = 0;
     config.custom = config_enable;
@@ -1163,6 +1167,58 @@ void RmArm::Arm_Set_Hand_Force_Callback(const rm_ros_interfaces::msg::Handforce:
     }
 }
 
+void RmArm::Arm_Set_Hand_Follow_Angle_Callback(const rm_ros_interfaces::msg::Handangle::SharedPtr msg)
+{
+    int angle[6];
+    bool block;
+    u_int32_t res;
+    std_msgs::msg::Bool set_hand_angle_result;
+    for(int i = 0;i<6;i++)
+    {
+        angle[i] = msg->hand_angle[i];
+    }
+    block = msg->block;
+    res = Rm_Api.Service_Set_Hand_Follow_Angle(m_sockhand, angle, block);
+    
+    if(res == 0)
+    {
+        set_hand_angle_result.data = true;
+        this->Set_Hand_Follow_Angle_Result->publish(set_hand_angle_result);
+    }
+    else
+    {
+        set_hand_angle_result.data = false;
+        this->Set_Hand_Follow_Angle_Result->publish(set_hand_angle_result);
+        RCLCPP_INFO (this->get_logger(),"Arm set hand follow angle error code is %d\n",res);
+    }
+}
+
+void RmArm::Arm_Set_Hand_Follow_Pos_Callback(const rm_ros_interfaces::msg::Handangle::SharedPtr msg)
+{
+    int pos[6];
+    bool block;
+    u_int32_t res;
+    std_msgs::msg::Bool set_hand_pos_result;
+    for(int i = 0;i<6;i++)
+    {
+        pos[i] = msg->hand_angle[i];
+    }
+    block = msg->block;
+    res = Rm_Api.Service_Set_Hand_Follow_Pos(m_sockhand, pos, block);
+    
+    if(res == 0)
+    {
+        set_hand_pos_result.data = true;
+        this->Set_Hand_Follow_Pos_Result->publish(set_hand_pos_result);
+    }
+    else
+    {
+        set_hand_pos_result.data = false;
+        this->Set_Hand_Follow_Pos_Result->publish(set_hand_pos_result);
+        RCLCPP_INFO (this->get_logger(),"Arm set hand follow angle error code is %d\n",res);
+    }
+}
+
 void RmArm::Arm_Set_Lift_Speed_Callback(const rm_ros_interfaces::msg::Liftspeed::SharedPtr msg)
 {
     int speed;
@@ -1407,6 +1463,18 @@ void Udp_RobotStatuscallback(RobotStatus Udp_RM_Callback)
     Udp_RM_Joint.sys_err = Udp_RM_Callback.sys_err;
     Udp_RM_Joint.arm_err = Udp_RM_Callback.arm_err;
     Udp_RM_Joint.coordinate = Udp_RM_Callback.force_sensor.coordinate;
+    if(udp_hand_g == true)
+    {
+        for(int i = 0; i < 6; i++)
+        {
+            Udp_RM_Joint.hand_angle[i] = Udp_RM_Callback.handState.hand_angle[i];
+            Udp_RM_Joint.hand_force[i] = Udp_RM_Callback.handState.hand_force[i];
+            Udp_RM_Joint.hand_pos[i] = Udp_RM_Callback.handState.hand_pos[i];
+            Udp_RM_Joint.hand_state[i] = Udp_RM_Callback.handState.hand_state[i];
+        }
+        Udp_RM_Joint.hand_err = Udp_RM_Callback.arm_err;
+    }
+    
 }
 
 void UdpPublisherNode::udp_timer_callback() 
@@ -1468,6 +1536,18 @@ void UdpPublisherNode::udp_timer_callback()
             this->One_Force_Result->publish(udp_oneforce_);
             udp_onezeroforce_.force_fz = Udp_RM_Joint.one_zero_force;
             this->One_Zero_Force_Result->publish(udp_onezeroforce_);
+        }
+        if(udp_hand_g == true)
+        {
+            for(int i = 0;i<6;i++)
+            {
+                udp_hand_status_.hand_angle[i] = Udp_RM_Joint.hand_angle[i];
+                udp_hand_status_.hand_force[i] = Udp_RM_Joint.hand_force[i];
+                udp_hand_status_.hand_pos[i] = Udp_RM_Joint.hand_pos[i];
+                udp_hand_status_.hand_state[i] = Udp_RM_Joint.hand_state[i];
+            }
+            udp_hand_status_.hand_err = Udp_RM_Joint.arm_err;  
+            this->Hand_Status_Result->publish(udp_hand_status_);
         }
         if(ctrl_flag == true )
         {
@@ -1550,15 +1630,16 @@ UdpPublisherNode::UdpPublisherNode():
         std::bind(&UdpPublisherNode::heart_timer_callback,this), callback_group_time2_);
         /********************************************************************UDP传输数据**********************************************************/
         Joint_Position_Result = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);                                 //发布当前的关节角度
-        Arm_Position_Result = this->create_publisher<geometry_msgs::msg::Pose>("rm_driver/udp_arm_position", 10);                          //发布当前的关节姿态
-        Six_Force_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/udp_six_force", 10);                        //发布当前的原始六维力数据
-        Six_Zero_Force_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/udp_six_zero_force", 10);              //发布当前标坐标系下六维力数据
-        One_Force_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/udp_one_force", 10);                        //发布当前的原始一维力数据
-        One_Zero_Force_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/udp_one_zero_force", 10);              //发布当前目标坐标系下一维力数据
+        Arm_Position_Result = this->create_publisher<geometry_msgs::msg::Pose>("rm_driver/udp_arm_position", 10);                         //发布当前的关节姿态
+        Six_Force_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/udp_six_force", 10);                       //发布当前的原始六维力数据
+        Six_Zero_Force_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/udp_six_zero_force", 10);             //发布当前标坐标系下六维力数据
+        One_Force_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/udp_one_force", 10);                       //发布当前的原始一维力数据
+        One_Zero_Force_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/udp_one_zero_force", 10);             //发布当前目标坐标系下一维力数据
         Joint_Error_Code_Result = this->create_publisher<rm_ros_interfaces::msg::Jointerrorcode>("rm_driver/udp_joint_error_code", 10);   //发布当前的关节错误码
-        Sys_Err_Result = this->create_publisher<std_msgs::msg::UInt16>("rm_driver/udp_sys_err", 10);                                       //发布当前的系统错误码
-        Arm_Err_Result = this->create_publisher<std_msgs::msg::UInt16>("rm_driver/udp_arm_err", 10);                                       //发布当前的机械臂错误码
-        Arm_Coordinate_Result = this->create_publisher<std_msgs::msg::UInt16>("rm_driver/udp_arm_coordinate", 10);                         //发布当前六维力数据的基准坐标系
+        Sys_Err_Result = this->create_publisher<std_msgs::msg::UInt16>("rm_driver/udp_sys_err", 10);                                      //发布当前的系统错误码
+        Arm_Err_Result = this->create_publisher<std_msgs::msg::UInt16>("rm_driver/udp_arm_err", 10);                                      //发布当前的机械臂错误码
+        Arm_Coordinate_Result = this->create_publisher<std_msgs::msg::UInt16>("rm_driver/udp_arm_coordinate", 10);                        //发布当前六维力数据的基准坐标系
+        Hand_Status_Result = this->create_publisher<rm_ros_interfaces::msg::Handstatus>("rm_driver/udp_hand_status", 10);                 //发布灵巧手状态数据
     
     
     }
@@ -1595,6 +1676,9 @@ RmArm::RmArm():
 
     this->declare_parameter<int>("udp_force_coordinate", udp_force_coordinate_);
     this->get_parameter<int>("udp_force_coordinate", udp_force_coordinate_);
+
+    this->declare_parameter<bool>("udp_hand", udp_hand_);
+    this->get_parameter<bool>("udp_hand", udp_hand_);
     udp_cycle_g = udp_cycle_;
     if(arm_type_ == "RM_65")
     {
@@ -1695,7 +1779,7 @@ RmArm::RmArm():
     sub_opt3.callback_group = callback_group_sub4_;
 
     Get_Arm_Version();//获取机械臂版本
-    Set_UDP_Configuration(udp_cycle_, udp_port_, udp_force_coordinate_, udp_ip_);
+    Set_UDP_Configuration(udp_cycle_, udp_port_, udp_force_coordinate_, udp_ip_, udp_hand_);
     /******************************************************获取udp配置********************************************************************/
     Get_Realtime_Push_Result = this->create_publisher<rm_ros_interfaces::msg::Setrealtimepush>("rm_driver/get_realtime_push_result", rclcpp::ParametersQoS());
     Get_Realtime_Push_Cmd = this->create_subscription<std_msgs::msg::Empty>("rm_driver/get_realtime_push_cmd",rclcpp::ParametersQoS(),
@@ -1886,10 +1970,20 @@ RmArm::RmArm():
     Set_Hand_Speed_Cmd = this->create_subscription<rm_ros_interfaces::msg::Handspeed>("rm_driver/set_hand_speed_cmd",rclcpp::ParametersQoS(),
         std::bind(&RmArm::Arm_Set_Hand_Speed_Callback,this,std::placeholders::_1),
         sub_opt3);
-    /*******************************************设置灵巧手角度************************************/
+    /*******************************************设置灵巧手力度************************************/
     Set_Hand_Force_Result = this->create_publisher<std_msgs::msg::Bool>("rm_driver/set_hand_force_result", rclcpp::ParametersQoS());
     Set_Hand_Force_Cmd = this->create_subscription<rm_ros_interfaces::msg::Handforce>("rm_driver/set_hand_force_cmd",rclcpp::ParametersQoS(),
         std::bind(&RmArm::Arm_Set_Hand_Force_Callback,this,std::placeholders::_1),
+        sub_opt3);
+    /*******************************************设置灵巧手角度跟随************************************/
+    Set_Hand_Follow_Angle_Result = this->create_publisher<std_msgs::msg::Bool>("rm_driver/set_hand_follow_angle_result", rclcpp::ParametersQoS());
+    Set_Hand_Follow_Angle_Cmd = this->create_subscription<rm_ros_interfaces::msg::Handangle>("rm_driver/set_hand_follow_angle_cmd",rclcpp::ParametersQoS(),
+        std::bind(&RmArm::Arm_Set_Hand_Follow_Angle_Callback,this,std::placeholders::_1),
+        sub_opt3);
+    /*******************************************设置灵巧手姿势跟随************************************/
+    Set_Hand_Follow_Pos_Result = this->create_publisher<std_msgs::msg::Bool>("rm_driver/set_hand_follow_pos_result", rclcpp::ParametersQoS());
+    Set_Hand_Follow_Pos_Cmd = this->create_subscription<rm_ros_interfaces::msg::Handangle>("rm_driver/set_hand_follow_pos_cmd",rclcpp::ParametersQoS(),
+        std::bind(&RmArm::Arm_Set_Hand_Follow_Pos_Callback,this,std::placeholders::_1),
         sub_opt3);
 /*******************************************************************************end*****************************************************************/
 
