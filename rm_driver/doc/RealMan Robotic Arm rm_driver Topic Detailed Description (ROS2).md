@@ -7,7 +7,7 @@
 
 <div align="center">
 
-# RealMan Robotic Arm rm_driver Topic Detailed Description (ROS2) V1.1.2
+# RealMan Robotic Arm rm_driver Topic Detailed Description (ROS2) V1.1.3
 
 
  
@@ -23,7 +23,7 @@ Revision History:
 |V1.1 | 2024-7-8  | Amend(Add teaching instructions3.6) |
 |V1.1.1| 2024-8-13| Amend(Add six-axis topic)           |
 |V1.1.2| 2024-9-25| Amend(revise coordinate topic description)|
-|V1.1.2.1| 2024-10-31| Amend(Add Agile Hand UDP Adaptation,Follow Adaptation)|
+|V1.1.3| 2024-10-31|Amend(Add Agile Hand UDP Adaptation,Follow Adaptation)|
 
 </div>
 
