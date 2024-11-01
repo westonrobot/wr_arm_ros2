@@ -489,14 +489,14 @@
 #### 设置UDP机械臂状态主动上报配置
 | 功能描述 | 设置UDP 机械臂状态主动上报配置 |
 | :---: | :---- |
-| 参数说明 | Setrealtimepush.msg<br>uint16 cycle：设置广播周期，为5ms的倍数(默认1即1*5=5ms,200Hz)。<br>uint16 port：设置广播的端口号(默认8089)。<br>uint16 force_coordinate：设置系统外受力数据的坐标系(仅带有力传感器的机械臂支持)。<br>string ip：设置自定义的上报目标IP 地址(默认192.168.1.10)。 |
-| 命令示例 | ros2 topic pub --once /rm_driver/set_realtime_push_cmd rm_ros_interfaces/msg/Setrealtimepush "cycle: 1<br>port: 8089<br>force_coordinate: 0<br>ip: '192.168.1.10'" |
+| 参数说明 | Setrealtimepush.msg<br>uint16 cycle：设置广播周期，为5ms的倍数(默认1即1*5=5ms,200Hz)。<br>uint16 port：设置广播的端口号(默认8089)。<br>uint16 force_coordinate：设置系统外受力数据的坐标系(仅带有力传感器的机械臂支持)。<br>string ip：设置自定义的上报目标IP 地址(默认192.168.1.10)<br>bool hand_enable：是否使能灵巧手状态上报，true使能，false不使能。 |
+| 命令示例 | ros2 topic pub --once /rm_driver/set_realtime_push_cmd rm_ros_interfaces/msg/Setrealtimepush "cycle: 1<br>port: 8089<br>force_coordinate: 0<br>ip: '192.168.1.10'<br>hand_enable: false" |
 | 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
 | 返回查询示例 | ros2 topic echo /rm_driver/set_realtime_push_result |
 #### 查询UDP机械臂状态主动上报配置
 | 功能描述 | 查询UDP 机械臂状态主动上报配置 |
 | :---: | :---- |
-| 参数说明 | Setrealtimepush.msg<br>uint16 cycle：设置广播周期，为5ms的倍数(默认1即1*5=5ms,200Hz)。<br>uint16 port：设置广播的端口号(默认8089)。<br>uint16 force_coordinate：设置系统外受力数据的坐标系(仅带有力传感器的机械臂支持)。<br>string ip：设置自定义的上报目标IP 地址(默认192.168.1.10)。 |
+| 参数说明 | Setrealtimepush.msg<br>uint16 cycle：设置广播周期，为5ms的倍数(默认1即1*5=5ms,200Hz)。<br>uint16 port：设置广播的端口号(默认8089)。<br>uint16 force_coordinate：设置系统外受力数据的坐标系(仅带有力传感器的机械臂支持)。<br>string ip：设置自定义的上报目标IP 地址(默认192.168.1.10)。<br>bool hand_enable：是否使能灵巧手状态上报，true使能，false不使能。 |
 | 命令示例 | ros2 topic pub --once /rm_driver/get_realtime_push_cmd std_msgs/msg/Empty "{}" |
 | 返回值 | 成功设置信息；失败返回：driver终端返回错误码。 |
 | 返回查询示例 | ros2 topic echo /rm_driver/get_realtime_push_result |
