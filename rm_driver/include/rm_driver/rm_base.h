@@ -294,7 +294,7 @@ RM_BASESHARED_EXPORT int Get_Collision_Stage(SOCKHANDLE ArmSocket, int *stage);
 RM_BASESHARED_EXPORT int Set_DH_Data(SOCKHANDLE ArmSocket, float lsb, float lse, float lew, float lwt_, float d3, bool block);
 
 ///
-/// \brief Get_DH_Data 该函数用于获取DH参数，一般在标定后使用
+/// \brief Get_DH_Data 该函数用于获取DH参数
 /// \param ArmSocket socket句柄
 /// \param lsb 获取到的DH参数，单位：mm
 /// \param lse 获取到的DH参数，单位：mm
@@ -1160,8 +1160,9 @@ RM_BASESHARED_EXPORT int Set_Gripper_Route(SOCKHANDLE ArmSocket, int min_limit, 
 /// \brief Set_Gripper_Release 手爪松开
 /// \param ArmSocket socket句柄
 /// \param speed 手爪松开速度 ，范围 1~1000，无单位量纲
-/// \param block RM_NONBLOCK-非阻塞，发送后立即返回; RM_BLOCK-阻塞，等待控制器返回设置成功指令
-/// \param timeout 设置返回超时时间，阻塞模式生效，单位：秒
+/// \param block RM_NONBLOCK-非阻塞，不接收夹爪到位指令; RM_BLOCK-阻塞，等待控制器返回夹爪到位指令
+/// \param timeout 非阻塞模式：0-发送后立即返回；其他值-接收设置成功指令后返回；
+///                阻塞模式：等待夹爪到位指令超时时间，单位：秒；
 /// \return 0-成功，失败返回:错误码, rm_define.h查询.
 ///
 RM_BASESHARED_EXPORT int Set_Gripper_Release(SOCKHANDLE ArmSocket, int speed, bool block, int timeout);
@@ -1171,8 +1172,9 @@ RM_BASESHARED_EXPORT int Set_Gripper_Release(SOCKHANDLE ArmSocket, int speed, bo
 /// \param ArmSocket socket句柄
 /// \param speed 手爪夹取速度 ，范围 1~1000，无单位量纲 无
 /// \param force 力控阈值 ，范围 ：50~1000，无单位量纲 无
-/// \param block RM_NONBLOCK-非阻塞，发送后立即返回; RM_BLOCK-阻塞，等待控制器返回设置成功指令
-/// \param timeout 设置返回超时时间，阻塞模式生效，单位：秒
+/// \param block RM_NONBLOCK-非阻塞，不接收夹爪到位指令; RM_BLOCK-阻塞，等待控制器返回夹爪到位指令
+/// \param timeout 非阻塞模式：0-发送后立即返回；其他值-接收设置成功指令后返回；
+///                阻塞模式：等待夹爪到位指令超时时间，单位：秒；
 /// \return 0-成功，失败返回:错误码, rm_define.h查询.
 ///
 RM_BASESHARED_EXPORT int Set_Gripper_Pick(SOCKHANDLE ArmSocket, int speed, int force, bool block, int timeout);
@@ -1182,8 +1184,9 @@ RM_BASESHARED_EXPORT int Set_Gripper_Pick(SOCKHANDLE ArmSocket, int speed, int f
 /// \param ArmSocket socket句柄
 /// \param speed 手爪夹取速度 ，范围 1~1000，无单位量纲 无
 /// \param force 力控阈值 ，范围 ：50~1000，无单位量纲 无
-/// \param block RM_NONBLOCK-非阻塞，发送后立即返回; RM_BLOCK-阻塞，等待控制器返回设置成功指令
-/// \param timeout 设置返回超时时间，阻塞模式生效，单位：秒
+/// \param block RM_NONBLOCK-非阻塞，不接收夹爪到位指令; RM_BLOCK-阻塞，等待控制器返回夹爪到位指令
+/// \param timeout 非阻塞模式：0-发送后立即返回；其他值-接收设置成功指令后返回；
+///                阻塞模式：等待夹爪到位指令超时时间，单位：秒；
 /// \return 0-成功，失败返回:错误码, rm_define.h查询.
 ///
 RM_BASESHARED_EXPORT int Set_Gripper_Pick_On(SOCKHANDLE ArmSocket, int speed, int force, bool block, int timeout);
@@ -1192,8 +1195,9 @@ RM_BASESHARED_EXPORT int Set_Gripper_Pick_On(SOCKHANDLE ArmSocket, int speed, in
 /// \brief Set_Gripper_Position 设置手爪开口度
 /// \param ArmSocket socket句柄
 /// \param position 手爪开口位置 ，范围 ：1~1000，无单位量纲 无
-/// \param block RM_NONBLOCK-非阻塞，发送后立即返回; RM_BLOCK-阻塞，等待控制器返回设置成功指令
-/// \param timeout 设置返回超时时间，阻塞模式生效，单位：秒
+/// \param block RM_NONBLOCK-非阻塞，不接收夹爪到位指令; RM_BLOCK-阻塞，等待控制器返回夹爪到位指令
+/// \param timeout 非阻塞模式：0-发送后立即返回；其他值-接收设置成功指令后返回；
+///                阻塞模式：等待夹爪到位指令超时时间，单位：秒；
 /// \return 0-成功，失败返回:错误码, rm_define.h查询.
 ///
 RM_BASESHARED_EXPORT int Set_Gripper_Position(SOCKHANDLE ArmSocket, int position, bool block, int timeout);
@@ -1386,6 +1390,26 @@ RM_BASESHARED_EXPORT int Set_Hand_Seq(SOCKHANDLE ArmSocket, int seq_num, bool bl
 /// \return 0-成功，失败返回:错误码, rm_define.h查询.
 ///
 RM_BASESHARED_EXPORT int Set_Hand_Angle(SOCKHANDLE ArmSocket, const int *angle, bool block);
+
+///
+/// \brief Set_Hand_Follow_Angle 设置灵巧手各关节跟随角度
+/// \details 设置灵巧手跟随角度，灵巧手有6个自由度，从1~6分别为小拇指，无名指，中指，食指，大拇指弯曲，大拇指旋转，最高50Hz的控制频率
+/// \param ArmSocket socket句柄
+/// \param angle 手指角度数组，6个元素分别代表6个自由度的角度。范围：0~1000.另外，-1代表该自由度不执行任何操作，保持当前状态
+/// \param block RM_NONBLOCK-非阻塞，发送后立即返回；RM_BLOCK-阻塞，等待控制器返回设置成功指令
+/// \return 0-成功，失败返回:错误码, rm_define.h查询.
+///
+RM_BASESHARED_EXPORT int Set_Hand_Follow_Angle(SOCKHANDLE ArmSocket, const int *angle, bool block);
+
+///
+/// \brief Set_Hand_Follow_Pos 设置灵巧手各关节跟随位置
+/// \details 设置灵巧手跟随角度，灵巧手有6个自由度，从1~6分别为小拇指，无名指，中指，食指，大拇指弯曲，大拇指旋转，最高50Hz的控制频率
+/// \param ArmSocket socket句柄
+/// \param angle 手指角度数组，6个元素分别代表6个自由度的角度。范围：0~1000.另外，-1代表该自由度不执行任何操作，保持当前状态
+/// \param block RM_NONBLOCK-非阻塞，发送后立即返回；RM_BLOCK-阻塞，等待控制器返回设置成功指令
+/// \return 0-成功，失败返回:错误码, rm_define.h查询.
+///
+RM_BASESHARED_EXPORT int Set_Hand_Follow_Pos(SOCKHANDLE ArmSocket, const int *pos, bool block);
 
 ///
 /// \brief Set_Hand_Speed 设置灵巧手各关节速度
@@ -2379,7 +2403,7 @@ RM_BASESHARED_EXPORT Pose Algo_Forward_Kinematics(const float* const joint);
 RM_BASESHARED_EXPORT void Algo_Set_Redundant_Parameter_Traversal_Mode(bool mode);
 
 ///
-/// \brief Algo_Inverse_Kinematics  逆解函数，默认单步模式，可使用Algo_Set_Redundant_Parameter_Traversal_Mode接口设置逆解求解模式
+/// \brief Algo_Inverse_Kinematics  逆解函数，默认遍历模式，可使用Algo_Set_Redundant_Parameter_Traversal_Mode接口设置逆解求解模式
 /// \param q_in                     上一时刻关节角度 单位°
 /// \param q_pose                   目标位姿
 /// \param q_out                    输出的关节角度 单位°

@@ -47,6 +47,7 @@ set(msg_files
   msg/Liftspeed.msg
   msg/Liftheight.msg
   msg/Liftstate.msg
+  msg/Handstatus.msg
 )
 
 # uncomment the following section in order to fill in

@@ -6,7 +6,7 @@
 
 <div align="center">
 
-# RealMan Robot rm_driver User Manual V1.2
+# RealMan Robot rm_driver User Manual V1.2.1
 
 RealMan Intelligent Technology (Beijing) Co., Ltd. 
 
@@ -14,9 +14,10 @@ Revision History:
 
 |No.	  | Date   |	Comment |
 | :---: | :----: | :---:   |
-|V1.0	  | 2/7/2024 | Draft |
-|V1.1	  | 7/8/2024 | Amend（Add GEN72 adapter files） |
-|V1.2	  | 9/10/2024| Amend（Add ECO63 adapter files） |
+|V1.0	  | 2/7/2024  | Draft |
+|V1.1	  | 7/8/2024  | Amend（Add GEN72 adapter files） |
+|V1.2	  | 9/10/2024 | Amend（Add ECO63 adapter files） |
+|V1.2.1 | 10/31/2024| Amend（Add dexterous hand udp topic） |
 
 </div>
 
@@ -50,7 +51,7 @@ Source code address:https://github.com/RealManRobot/ros2_rm_robot.git.
 First, after configuring the environment and completing the connection, we can directly start the node and control the robotic arm through the following command.
 The current control is based on the fact that we have not changed the IP of the robotic arm, which is still 192.168.1.18.
 rm@rm-desktop:~$ ros2 launch rm_driver rm_<arm_type>_driver.launch.py
-In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65, eco63, 75, and gen72.
+In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65、eco63, gen72 and 75.
 The following screen will appear if the underlying driver is successfully started.
 ![image](doc/rm_driver1.png)  
 ### 2.2 Advanced use of the package
@@ -79,7 +80,7 @@ rm_driver:
 There are mainly the following parameters.
 * arm_ip: This parameter represents the current IP of the robotic arm
 * tcp_port: set the port when TCP is connected.
-* arm_type: This parameter represents the current model of the robotic arm. The parameters that can be selected are RM_65 (65 series), RM_eco65 (ECO65 series),RM_eco63 (ECO63 series), RM_63 (63 series), RM_75 (75 series), and GEN72 (72 series).
+* arm_type: This parameter represents the current model of the robotic arm. The parameters that can be selected are RM_65 (65 series), RM_eco65 (ECO65 series), RM_eco63 (ECO63 series), RM_63 (63 series),GEN_72 (GEN72 series) and RM_75 (75 series).
 * arm_dof: set the degree of freedom of the robotic arm. 6 is 6 degrees of freedom, and 7 is 7 degrees of freedom.
 * udp_ip: set the udp active reporting IP address.
 * udp_cycle: the active reporting cycle of UDP, which needs to be a multiple of 5.
@@ -152,4 +153,4 @@ The current rm_driver package is composed of the following files.
 rm_driver has many topics, and you can learn about the topic information through the following commands.
 ![image](doc/rm_driver2.png)
 ![image](doc/rm_driver3.png)  
-It is mainly for the application of API to achieve some of the robotic arm functions; for a more complete introduction and use, please see the special document "[RealMan Robotic Arm ROS2 Topic Detailed Description](https://github.com/RealManRobot/ros2_rm_robot/blob/humble1.1.0/rm_driver/doc/RealMan%20Robotic%20Arm%20rm_driver%20Topic%20Detailed%20Description%20(ROS2).md)".
+It is mainly for the application of API to achieve some of the robotic arm functions; for a more complete introduction and use, please see the special document "[RealMan Robotic Arm ROS2 Topic Detailed Description](https://github.com/RealManRobot/ros2_rm_robot/blob/humble/rm_driver/doc/RealMan%20Robotic%20Arm%20rm_driver%20Topic%20Detailed%20Description%20(ROS2).md)".

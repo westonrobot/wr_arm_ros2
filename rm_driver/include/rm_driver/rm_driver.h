@@ -64,6 +64,7 @@
 #include "rm_ros_interfaces/msg/liftspeed.hpp"
 #include "rm_ros_interfaces/msg/liftstate.hpp"
 #include "rm_ros_interfaces/msg/liftheight.hpp"
+#include "rm_ros_interfaces/msg/handstatus.hpp"
 #include <std_msgs/msg/u_int32.hpp>
 #include <std_msgs/msg/int32.hpp>
 #include <std_msgs/msg/empty.hpp>
@@ -92,6 +93,8 @@ int udp_cycle_g = 5;
 int arm_dof_g = 6;
 //ctrl+c触发信号
 bool ctrl_flag = false;
+// 灵巧手数据发布
+bool udp_hand_g = false;
 //api类
 RM_Service Rm_Api;
 //机械臂TCp网络通信套接字
@@ -118,6 +121,11 @@ typedef struct
     float    one_zero_force;           //一维力基准坐标系下系统受力数据
     uint16_t control_version;          //版本信息
     uint16_t coordinate;               //当前六维力传感器的基准坐标
+    uint16_t hand_angle[6];            //手指角度数组，范围：0~2000.
+    uint16_t hand_pos[6];              //手指位置数组，范围：0~1000.
+    uint16_t hand_state[6];            //手指状态,0正在松开，1正在抓取，2位置到位停止，3力到位停止，5电流保护停止，6电缸堵转停止，7电缸故障停止
+    uint16_t hand_force[6];            //灵巧手自由度电流，单位mN
+    uint16_t hand_err;                 //灵巧手系统错误，1表示有错误，0表示无错误
 } JOINT_STATE_VALUE;
 JOINT_STATE_VALUE Udp_RM_Joint;
 
@@ -131,8 +139,10 @@ rm_ros_interfaces::msg::Sixforce udp_zeroforce_;                    //六维力�
 rm_ros_interfaces::msg::Sixforce udp_oneforce_;                     //一维力传感器原始数据
 rm_ros_interfaces::msg::Sixforce udp_onezeroforce_;                 //一维力传感器转化后数据
 rm_ros_interfaces::msg::Jointerrorcode udp_joint_error_code_;       //关节报错数据
+rm_ros_interfaces::msg::Handstatus udp_hand_status_;
 rm_ros_interfaces::msg::Armoriginalstate Arm_original_state;        //机械臂原始数据（角度+欧拉角）
 rm_ros_interfaces::msg::Armstate Arm_state;                         //机械臂数据（弧度+四元数）
+
 
 class RmArm: public rclcpp::Node
 {
@@ -142,7 +152,7 @@ public:
 
 /**********************************************初始化需要用到的回调函数***********************************************/
     void Get_Arm_Version();                                                                                 //获取版本信息
-    void Set_UDP_Configuration(int udp_cycle, int udp_port, int udp_force_coordinate, std::string udp_ip);  //设置udp主动上报配置
+    void Set_UDP_Configuration(int udp_cycle, int udp_port, int udp_force_coordinate, std::string udp_ip,bool hand);  //设置udp主动上报配置
     /*******************************运动控制回调函数******************************/
     // void Arm_MoveJ_75_Callback(rm_ros_interfaces::msg::Movej75::SharedPtr msg);                          //75角度控制
     void Arm_MoveJ_Callback(rm_ros_interfaces::msg::Movej::SharedPtr msg);                                  //角度控制
@@ -190,6 +200,8 @@ public:
     void Arm_Set_Hand_Angle_Callback(const rm_ros_interfaces::msg::Handangle::SharedPtr msg);               //设置灵巧手角度
     void Arm_Set_Hand_Speed_Callback(const rm_ros_interfaces::msg::Handspeed::SharedPtr msg);               //设置灵巧手速度
     void Arm_Set_Hand_Force_Callback(const rm_ros_interfaces::msg::Handforce::SharedPtr msg);               //设置灵巧手力控
+    void Arm_Set_Hand_Follow_Angle_Callback(const rm_ros_interfaces::msg::Handangle::SharedPtr msg);        //设置灵巧手角度跟随
+    void Arm_Set_Hand_Follow_Pos_Callback(const rm_ros_interfaces::msg::Handangle::SharedPtr msg);          //设置灵巧手位置跟随
     /*********************************升降机构回调函数******************************/
     void Arm_Set_Lift_Speed_Callback(const rm_ros_interfaces::msg::Liftspeed::SharedPtr msg);               //升降机构速度开环控制
     void Arm_Set_Lift_Height_Callback(const rm_ros_interfaces::msg::Liftheight::SharedPtr msg);             //升降机构位置闭环控制
@@ -383,6 +395,14 @@ private:
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr Set_Hand_Force_Result;
     /***************************************设置灵巧手各关节力阈值订阅器********************************/
     rclcpp::Subscription<rm_ros_interfaces::msg::Handforce>::SharedPtr Set_Hand_Force_Cmd;
+    /**************************************设置灵巧手各关节角度跟随结果发布器*********************************/
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr Set_Hand_Follow_Angle_Result;
+    /***************************************设置灵巧手各关节角度设置订阅器********************************/
+    rclcpp::Subscription<rm_ros_interfaces::msg::Handangle>::SharedPtr Set_Hand_Follow_Angle_Cmd;
+    /**************************************设置灵巧手各关节位置跟随结果发布器*********************************/
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr Set_Hand_Follow_Pos_Result;
+    /***************************************设置灵巧手各关节位置跟随订阅器********************************/
+    rclcpp::Subscription<rm_ros_interfaces::msg::Handangle>::SharedPtr Set_Hand_Follow_Pos_Cmd;
 /*****************************************************************end******************************************************************/
 
 /********************************************************************升降机构***********************************************************/
@@ -431,6 +451,7 @@ private:
     int arm_dof_ = 7;                                  //机械臂自由度
     int udp_cycle_ = 5;                                //udp主动上报周期（ms）
     int udp_force_coordinate_ = 0;                     //udp主动上报系统六维力参考坐标系
+    bool udp_hand_ = false;
 
     rclcpp::CallbackGroup::SharedPtr callback_group_sub1_;
     rclcpp::CallbackGroup::SharedPtr callback_group_sub2_;
@@ -464,6 +485,7 @@ private:
     rclcpp::Publisher<std_msgs::msg::UInt16>::SharedPtr Sys_Err_Result;                                              //系统报错发布器
     rclcpp::Publisher<std_msgs::msg::UInt16>::SharedPtr Arm_Err_Result;                                              //机械臂报错发布器
     rclcpp::Publisher<std_msgs::msg::UInt16>::SharedPtr Arm_Coordinate_Result;                                       //力传感器基准坐标发布器
+    rclcpp::Publisher<rm_ros_interfaces::msg::Handstatus>::SharedPtr Hand_Status_Result;                             //灵巧手数据发布器
     int connect_state = 0;                             //网络连接状态
     int come_time = 0;
     struct sockaddr_in clientAddr;

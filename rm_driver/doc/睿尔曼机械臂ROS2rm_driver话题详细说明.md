@@ -7,7 +7,7 @@
 
 <div align="center">
 
-# 睿尔曼机械臂接口函数说明(ROS2)V1.1.2
+# 睿尔曼机械臂接口函数说明(ROS2)V1.1.3
 
 
  
@@ -19,10 +19,11 @@
 
 |版本号 | 时间 | 备注 |
 | :---: | :---- | :---: |
-|V1.0 | 2024-2-18 | 拟制|
+|V1.0 | 2024-2-18 | 拟制 |
 |V1.1 | 2024-7-8  | 修订（添加示教指令3.6） |
 |V1.1.1| 2024-8-13| 修订（添加查询六维力数据）|
 |V1.1.2| 2024-9-25| 修订（修正坐标系话题描述错误）|
+|V1.1.3| 2024-10-31|修订（添加灵巧手UDP功能，跟随功能）|
 
 </div>
 
@@ -78,6 +79,8 @@
 * 3.12.3[设置灵巧手各自由度角度](#设置灵巧手各自由度角度)
 * 3.12.4[设置灵巧手速度](#设置灵巧手速度)
 * 3.12.5[设置灵巧手力阈值](#设置灵巧手力阈值)
+* 3.12.6[设置灵巧手角度跟随](#设置灵巧手角度跟随)
+* 3.12.7[设置灵巧手姿态跟随](#设置灵巧手姿态跟随)
 * 3.13[升降机构](#升降机构)
 * 3.13.1[升降机构速度开环控制](#升降机构速度开环控制)
 * 3.13.2[升降机构位置闭环控制](#升降机构位置闭环控制)
@@ -91,7 +94,6 @@
 * 3.15.1[设置UDP机械臂状态主动上报配置](#设置UDP机械臂状态主动上报配置)
 * 3.15.2[查询UDP机械臂状态主动上报配置](#查询UDP机械臂状态主动上报配置)
 * 3.15.3[UDP机械臂状态主动上报](#UDP机械臂状态主动上报)
-
 
  
 ## 简介
@@ -175,7 +177,7 @@
 
 | 功能描述 | 清除关节错误代码 |
 | :---: | :---- |
-| 参数说明 | Jointerrclear.msg<br>uint8 joint_num：对应关节序号，从基座到机械臂手爪端，序号依次为1～6。<br>bool block：是否为阻塞模式，bool类型，true:阻塞，false:非阻塞 |
+| 参数说明 | Jointerrclear.msg<br>uint8 joint_num：对应关节序号，从基座到机械臂手爪端，六自由度序号依次为1～6，七自由度序号依次为1～7。<br>bool block：是否为阻塞模式，bool类型，true:阻塞，false:非阻塞 |
 | 命令示例 | ros2 topic pub /rm_driver/set_joint_err_clear_cmd rm_ros_interfaces/msg/Jointerrclear "joint_num: 1 <br>block: true" |
 | 返回值 | true-设置成功，false-设置失败 |
 | 返回查询示例 | ros2 topic echo /rm_driver/set_joint_err_clear_result |
@@ -208,14 +210,14 @@
 | :---: | :---- |
 | 参数说明 | ROS自带msg std_msgs::msg::Empty |
 | 命令示例 | ros2 topic pub --once /rm_driver/get_curr_workFrame_cmd std_msgs/msg/Empty "{}" |
-| 返回值 | 当前工作坐标系名称 |
+| 返回值 | true-设置成功，false-设置失败 |
 | 返回查询示例 | ros2 topic echo /rm_driver/get_curr_workFrame_result |
 #### 查询所有工作坐标系
 | 功能描述 | 查询所有工作坐标系 |
 | :---: | :---- |
 | 参数说明 | ROS自带msg std_msgs::msg::Empty |
 | 命令示例 | ros2 topic pub --once /rm_driver/get_all_work_frame_cmd std_msgs/msg/Empty "{}" |
-| 返回值 | 所有工作坐标系所有名称 |
+| 返回值 | 所有工作坐标系名称 |
 | 返回查询示例 | ros2 topic echo /rm_driver/get_all_work_frame_result |
 ### 机械臂状态查询
 #### 获取机械臂当前状态-返回各关节角度和欧拉角
@@ -277,7 +279,7 @@
 #### 轨迹急停
 | 功能描述 | 运动规划轨迹急停 |
 | :---: | :---- |
-| 参数说明 | ROS官方msg std_msgs::msg::Bool<br>bool data：是否轨迹急停true急停，false不急停。 |
+| 参数说明 | ROS官方msg std_msgs::msg::Bool<br>bool data：是否为阻塞模式，bool类型，true:阻塞，false:非阻塞。 |
 | 命令示例 | ros2 topic pub /rm_driver/move_stop_cmd std_msgs/msg/Bool "data: true" |
 | 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
 | 返回查询示例 | ros2 topic echo /rm_driver/move_stop_result |
@@ -331,22 +333,22 @@
 #### 设置夹爪力控夹取
 | 功能描述 | 设置夹爪力控夹取 |
 | :---: | :---- |
-| 参数说明 | Gripperpick.msg<br>uint16 speed：1～1000,代表手爪开合速度，无量纲。<br>uint16 force：1～1000,代表手爪夹持力，最大1.5kg。<br>bool block：是否为阻塞模式，true:阻塞，false:非阻塞。<br>uint16 timeout：设置返回超时时间，阻塞模式生效（以秒为单位） |
-| 命令示例 | ros2 topic pub --once /rm_driver/set_gripper_pick_cmd rm_ros_interfaces/msg/Gripperpick "speed: 200<br>force: 200<br>block: true<br>block: true<br>timeout: 100" |
+| 参数说明 | Gripperpick.msg<br>uint16 speed：1～1000,代表手爪开合速度，无量纲。<br>uint16 force：1～1000,代表手爪夹持力，最大1.5kg。<br>bool block：是否为阻塞模式，true:阻塞，false:非阻塞。 |
+| 命令示例 | ros2 topic pub --once /rm_driver/set_gripper_pick_cmd rm_ros_interfaces/msg/Gripperpick "speed: 200<br>force: 200<br>block: true<br>timeout: 1000" |
 | 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
 | 返回查询示例 | ros2 topic echo /rm_driver/set_gripper_pick_result |
 #### 设置夹爪持续力控夹取
 | 功能描述 | 设置夹爪持续力控夹取 |
 | :---: | :---- |
-| 参数说明 | Gripperpick.msg<br>uint16 speed：1～1000,代表手爪开合速度，无量纲。<br>uint16 force：1～1000,代表手爪夹持力，最大1.5kg。<br>bool block：是否为阻塞模式，true:阻塞，false:非阻塞。<br>uint16 timeout：设置返回超时时间，阻塞模式生效（以秒为单位） |
-| 命令示例 | ros2 topic pub --once /rm_driver/set_gripper_pick_on_cmd rm_ros_interfaces/msg/Gripperpick "speed: 200<br>force: 200<br>block: true<br>timeout: 100" |
+| 参数说明 | Gripperpick.msg<br>uint16 speed：1～1000,代表手爪开合速度，无量纲。<br>uint16 force：1～1000,代表手爪夹持力，最大1.5kg。<br>bool block：是否为阻塞模式，true:阻塞，false:非阻塞。 |
+| 命令示例 | ros2 topic pub --once /rm_driver/set_gripper_pick_on_cmd rm_ros_interfaces/msg/Gripperpick "speed: 200<br>force: 200<br>block: true<br>timeout: 1000" |
 | 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
 | 返回查询示例 | ros2 topic echo /rm_driver/set_gripper_pick_on_result |
 #### 夹爪到达指定位置
 | 功能描述 | 夹爪到达指定位置 |
 | :---: | :---- |
-| 参数说明 | Gripperset.msg<br>uint16 position：手爪目标位置，范围：1～1000,代表手爪开口度：0～70mm<br>bool block：是否为阻塞模式，true:阻塞，false:非阻塞。<br>uint16 timeout：设置返回超时时间，阻塞模式生效（以秒为单位） |
-| 命令示例 | ros2 topic pub --once /rm_driver/set_gripper_position_cmd rm_ros_interfaces/msg/Gripperset "position: 500<br>block: true<br>timeout: 100" |
+| 参数说明 | Gripperset.msg<br>uint16 position：手爪目标位置，范围：1～1000,代表手爪开口度：0～70mm<br>bool block：是否为阻塞模式，true:阻塞，false:非阻塞。 |
+| 命令示例 | ros2 topic pub --once /rm_driver/set_gripper_position_cmd rm_ros_interfaces/msg/Gripperset "position: 500<br>block: true<br>timeout: 1000" |
 | 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
 | 返回查询示例 | ros2 topic echo /rm_driver/set_gripper_position_result |
 ### 拖动示教及轨迹复现
@@ -372,7 +374,7 @@
 | 参数说明 | std_msgs::msg::Empty |
 | 命令示例 | ros2 topic pub rm_driver/get_force_data_cmd std_msgs/msg/Empty "{}" |
 | 返回值 | 成功返回对应坐标系六维力数据。 |
-| 返回查询示例 | ros2 topic echo /rm_driver/get_force_data_result原始数据<br>ros2 topic echo /rm_driver/get_zero_force_data_result系统受力数据<br>ros2 topic echo /rm_driver/get_work_force_data_result工作坐标系受理数据<br>ros2 topic echo /rm_driver/get_tool_force_data_result工具坐标系受理数据 |
+| 返回查询示例 | ros2 topic echo /rm_driver/get_force_data_result原始数据<br>ros2 topic echo /rm_driver/get_zero_force_data_result系统受力数据<br>ros2 topic echo /rm_driver/get_work_force_data_result工作坐标系受力数据<br>ros2 topic echo /rm_driver/get_tool_force_data_result工具坐标系受力数据 |
 #### 清空六维力数据
 | 功能描述 | 清空六维力数据 |
 | :---: | :---- |
@@ -417,6 +419,20 @@
 | 命令示例 | ros2 topic pub --once /rm_driver/set_hand_force_cmd rm_ros_interfaces/msg/Handforce "hand_force: 200<br>block: true" |
 | 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
 | 返回查询示例 | ros2 topic echo /rm_driver/set_hand_force_result |
+#### 设置灵巧手角度跟随
+| 功能描述 | 设置灵巧手角度跟随 |
+| :---: | :---- |
+| 参数说明 | Handangle.msg<br>int16[6] hand_angle：手指角度数组，范围(根据实际设备属性，以下为因时参考)：0~2000.另外，-1 代表该自由度不执行任何操作，保持当前状态。<br>bool data：是否为阻塞模式，true:阻塞，false:非阻塞。 |
+| 命令示例 | ros2 topic pub --once /rm_driver/set_hand_follow_angle_cmd rm_ros_interfaces/msg/Handangle "hand_angle:<br>- 0<br>- 0<br>- 0<br>- 0<br>- 0<br>- 0<br>block: true" |
+| 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
+| 返回查询示例 | ros2 topic echo /rm_driver/set_hand_follow_angle_result |
+#### 设置灵巧手姿态跟随
+| 功能描述 | 设置灵巧手姿态跟随 |
+| :---: | :---- |
+| 参数说明 | Handangle.msg<br>int16[6] hand_angle：手指姿态数组，范围(根据实际设备属性，以下为因时参考)：0~1000.另外，-1 代表该自由度不执行任何操作，保持当前状态。<br>bool data：是否为阻塞模式，true:阻塞，false:非阻塞。 |
+| 命令示例 | ros2 topic pub --once /rm_driver/set_hand_follow_pos_cmd rm_ros_interfaces/msg/Handangle "hand_angle:<br>- 0<br>- 0<br>- 0<br>- 0<br>- 0<br>- 0<br>block: true" |
+| 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
+| 返回查询示例 | ros2 topic echo /rm_driver/set_hand_follow_pos_result |
 ### 升降机构
 睿尔曼机械臂可集成自主研发升降机构。
 #### 升降机构速度开环控制
@@ -430,9 +446,9 @@
 | 功能描述 | 升降机构位置闭环控制 |
 | :---: | :---- |
 | 参数说明 | Liftheight.msg<br>uint16 height：目标高度，单位 mm，范围：0-2600。<br>uint16 speed：速度百分比，1-100。<br>bool data：是否为阻塞模式，true:阻塞，false:非阻塞。 |
-| 命令示例 | ros2 topic pub --once /rm_driver/set_lift_height_cmd rm_ros_interfaces/msg/Liftheight "height: 10<br>speed: 10<br>block: true" |
+| 命令示例 | ros2 topic pub --once /rm_driver/set_lift_height_cmd rm_ros_interfaces/msg/Liftheight "height: 0<br>speed: 10<br>block: true" |
 | 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
-| 返回查询示例 | ros2 topic echo /rm_driver/set_lift_height_result |
+| 返回查询示例 | ros2 topic echo rm_driver/set_lift_height_result |
 #### 获取升降机构状态
 | 功能描述 | 获取升降机构状态 |
 | :---: | :---- |
@@ -470,17 +486,17 @@
 | 命令示例 | 需要是大量(10个以上)位置连续 的点，以2ms以上的周期持续发布。<br>ros2 topic pub /rm_driver/force_position_move_pose_cmd rm_ros_interfaces/msg/Forcepositionmovepose "pose:<br>  position:<br>    x: 0.0<br>    y: 0.0<br>    z: 0.0<br>  orientation:<br>    x: 0.0<br>    y: 0.0<br>    z: 0.0<br>    w: 1.0<br>sensor: 0<br>mode: 0<br>dir: 0<br>force: 0<br>follow: false" |
 | 返回值 | 成功无返回；失败返回：false，driver终端返回错误码。
 ### 机械臂状态主动上报
-#### 设置 UDP 机械臂状态主动上报配置
+#### 设置UDP机械臂状态主动上报配置
 | 功能描述 | 设置UDP 机械臂状态主动上报配置 |
 | :---: | :---- |
-| 参数说明 | Setrealtimepush.msg<br>uint16 cycle：设置广播周期，为5ms的倍数(默认1即1*5=5ms,200Hz)。<br>uint16 port：设置广播的端口号(默认8089)。<br>uint16 force_coordinate：设置系统外受力数据的坐标系(仅带有力传感器的机械臂支持)。<br>string ip：设置自定义的上报目标IP 地址(默认192.168.1.10)。 |
-| 命令示例 | ros2 topic pub --once /rm_driver/set_realtime_push_cmd rm_ros_interfaces/msg/Setrealtimepush "cycle: 1<br>port: 8089<br>force_coordinate: 0<br>ip: '192.168.1.10'" |
+| 参数说明 | Setrealtimepush.msg<br>uint16 cycle：设置广播周期，为5ms的倍数(默认1即1*5=5ms,200Hz)。<br>uint16 port：设置广播的端口号(默认8089)。<br>uint16 force_coordinate：设置系统外受力数据的坐标系(仅带有力传感器的机械臂支持)。<br>string ip：设置自定义的上报目标IP 地址(默认192.168.1.10)<br>bool hand_enable：是否使能灵巧手状态上报，true使能，false不使能。 |
+| 命令示例 | ros2 topic pub --once /rm_driver/set_realtime_push_cmd rm_ros_interfaces/msg/Setrealtimepush "cycle: 1<br>port: 8089<br>force_coordinate: 0<br>ip: '192.168.1.10'<br>hand_enable: false" |
 | 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
 | 返回查询示例 | ros2 topic echo /rm_driver/set_realtime_push_result |
-#### 查询 UDP 机械臂状态主动上报配置
+#### 查询UDP机械臂状态主动上报配置
 | 功能描述 | 查询UDP 机械臂状态主动上报配置 |
 | :---: | :---- |
-| 参数说明 | Setrealtimepush.msg<br>uint16 cycle：设置广播周期，为5ms的倍数(默认1即1*5=5ms,200Hz)。<br>uint16 port：设置广播的端口号(默认8089)。<br>uint16 force_coordinate：设置系统外受力数据的坐标系(仅带有力传感器的机械臂支持)。<br>string ip：设置自定义的上报目标IP 地址(默认192.168.1.10)。 |
+| 参数说明 | Setrealtimepush.msg<br>uint16 cycle：设置广播周期，为5ms的倍数(默认1即1*5=5ms,200Hz)。<br>uint16 port：设置广播的端口号(默认8089)。<br>uint16 force_coordinate：设置系统外受力数据的坐标系(仅带有力传感器的机械臂支持)。<br>string ip：设置自定义的上报目标IP 地址(默认192.168.1.10)。<br>bool hand_enable：是否使能灵巧手状态上报，true使能，false不使能。 |
 | 命令示例 | ros2 topic pub --once /rm_driver/get_realtime_push_cmd std_msgs/msg/Empty "{}" |
 | 返回值 | 成功设置信息；失败返回：driver终端返回错误码。 |
 | 返回查询示例 | ros2 topic echo /rm_driver/get_realtime_push_result |
@@ -556,3 +572,9 @@
 | 参数说明 | std_msgs::msg::UInt16<br>uint16 data：系统外受力数据的坐标系，0 为传感器坐标系 1 为当前工作坐标系 2 为当前工具坐标系。该数据会影响一维力和六维力传感器系统外受力数据的参考坐标系 |
 | 查询示例 | ros2 topic echo /rm_driver/udp_arm_coordinate |
 
+* 灵巧手力当前状态
+
+| 功能描述 | 获取灵巧手力当前状态 |
+| :----: | :---- |
+| 参数说明 | rm_ros_interfaces::msg::Handstatus.msg<br>uint16[6] hand_angle：#手指角度数组，范围：0~2000.<br>uint16[6] hand_pos：#手指位置数组，范围：0~1000.<br>uint16[6] hand_state：#手指状态,0正在松开，1正在抓取，2位置到位停止，3力到位停止，5电流保护停止，6电缸堵转停止，7电缸故障停止.<br>uint16[6] hand_force：#灵巧手自由度电流，单位mN.<br>uint16  hand_err：#灵巧手系统错误，1表示有错误，0表示无错误. |
+| 查询示例 | ros2 topic echo /rm_driver/udp_hand_status |

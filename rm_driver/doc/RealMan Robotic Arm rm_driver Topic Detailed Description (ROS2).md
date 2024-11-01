@@ -7,7 +7,7 @@
 
 <div align="center">
 
-# RealMan Robotic Arm rm_driver Topic Detailed Description (ROS2) V1.1.2
+# RealMan Robotic Arm rm_driver Topic Detailed Description (ROS2) V1.1.3
 
 
  
@@ -23,6 +23,7 @@ Revision History:
 |V1.1 | 2024-7-8  | Amend(Add teaching instructions3.6) |
 |V1.1.1| 2024-8-13| Amend(Add six-axis topic)           |
 |V1.1.2| 2024-9-25| Amend(revise coordinate topic description)|
+|V1.1.3| 2024-10-31|Amend(Add Agile Hand UDP Adaptation,Follow Adaptation)|
 
 </div>
 
@@ -78,6 +79,8 @@ Revision History:
 * 3.12.3[Setting the angles of various degrees of freedom for the dexterous hand](#Setting_the_angles_of_various_degrees_of_freedom_for_the_dexterous_hand)
 * 3.12.4[Setting the dexterous hand speed](#Setting_the_dexterous_hand_speed)
 * 3.12.5[Setting the force threshold of the dexterous hand](#Setting_the_force_threshold_of_the_dexterous_hand)
+* 3.12.6[Setting the angle following of the dexterous hand](#Setting_the_angle_following_of_the_dexterous_hand)
+* 3.12.7[Setting the posture following of the dexterous hand](#Setting_the_posture_following_of_the_dexterous_hand)
 * 3.13[Lifting mechanism](#Lifting_mechanism)
 * 3.13.1[Speed open-loop control of the lifting mechanism](#Speed_open-loop_control_of_the_lifting_mechanism)
 * 3.13.2[Position closed-loop control of the lifting mechanism](#Position_closed-loop_control_of_the_lifting_mechanism)
@@ -91,6 +94,7 @@ Revision History:
 * 3.15.1[Setting UDP robotic arm state active reporting configuration](#Setting_UDP_robotic_arm_state_active_reporting_configuration)
 * 3.15.2[Getting UDP robotic arm state active reporting configuration](#Getting_UDP_robotic_arm_state_active_reporting_configuration)
 * 3.15.3[UDP robotic arm state active reporting](#UDP_robotic_arm_state_active_reporting)
+
  
 ## Introduction
 RealMan provides ROS2 function packages based on API to help users control the robotic arm using ROS2. If you want to learn more about controlling the robotic arm, you can refer to the API documentation and instructions. In practical use, the user can establish communication with the robotic arm through the Ethernet port and control the robotic arm.
@@ -300,6 +304,13 @@ This section describes how to query and control the robotic arm through the topi
 | Parameter description | Ortteach.msg.msg<br>uint8 type：Teaching demonstration type: input0:RX-axis direction、1:RY-axis direction、2:RZ-axis direction<br>uint8 direction:teach direction，0-negative direction，1-positive direction<br>uint8 speed:speed percentage ratio coefficient, 0-100.<br>bool block：whether it is a blocking mode, bool type, true: blocking, false: non-blocking. |
 | Return value | Successful return: true; failure returns: false, the driver terminal returns an error code. |
 | Return example | ros2 topic echo /rm_driver/set_ort_teach_result |
+#### Stop_teaching
+| Function description | Stop teaching |
+| :---: | :---- |
+| Parameter description | ROS msg std_msgs::msg::Bool<br>bool data：whether the trajectory is blocking mode, true: blocking, false: not blocking.|
+| Command example | ros2 topic pub /rm_driver/set_stop_teach_cmd std_msgs/msg/Bool "data: true" |
+| Return value | Successful return: true; failure returns: false, the driver terminal returns an error code. |
+| Return example | ros2 topic echo /rm_driver/set_stop_teach_result |
 ### Functions_related_to_controller_configuration
 #### Get_the_controller's_version
 | Function description | Get the controller's version |
@@ -321,22 +332,22 @@ The RealMan robotic arm is equipped with an Inspire Robots EG2-4C2 gripper. The 
 #### Setting_the_Gripper_Pick
 | Function description | Setting the gripper pick |
 | :---: | :---- |
-| Parameter description | Gripperpick.msg<br>uint16 speed：1～1000,representing the opening and closing speed of the gripper, dimensionless.<br>uint16 force:representing the gripping force of the gripper, maximum 1.5 kg.<br>bool block: whether it is a blocking mode, bool type, true: blocking, false: non-blocking.<br>uint16 timeout:Set the return timeout time, and the blocking mode takes effect (in seconds). |
-| Command example | ros2 topic pub --once /rm_driver/set_gripper_pick_cmd rm_ros_interfaces/msg/Gripperpick "speed: 200<br>force: 200<br>block: true<br>timeout: 100" |
+| Parameter description | Gripperpick.msg<br>uint16 speed：1～1000,representing the opening and closing speed of the gripper, dimensionless.<br>uint16 force:representing the gripping force of the gripper, maximum 1.5 kg.<br>bool block: whether it is a blocking mode, bool type, true: blocking, false: non-blocking. |
+| Command example | ros2 topic pub --once /rm_driver/set_gripper_pick_cmd rm_ros_interfaces/msg/Gripperpick "speed: 200<br>force: 200<br>block: true<br>timeout: 1000" |
 | Return value | Successful return: true; failure returns: false, the driver terminal returns an error code. |
 | Return example | ros2 topic echo /rm_driver/set_gripper_pick_result |
 #### Setting_the_gripper_pick-on
 | Function description | Setting the gripper pick-on |
 | :---: | :---- |
-| Parameter description | Gripperpick.msg<br>uint16 speed：1～1000, representing the opening and closing speed of the gripper, dimensionless.<br>uint16 force：1～1000,representing the gripping force of the gripper, maximum 1.5 kg.<br>bool block: whether it is a blocking mode, bool type, true: blocking, false: non-blocking.<br>uint16 timeout:Set the return timeout time, and the blocking mode takes effect (in seconds). |
-| Command example | ros2 topic pub --once /rm_driver/set_gripper_pick_on_cmd rm_ros_interfaces/msg/Gripperpick "speed: 200<br>force: 200<br>block: true<br>timeout: 100" |
+| Parameter description | Gripperpick.msg<br>uint16 speed：1～1000, representing the opening and closing speed of the gripper, dimensionless.<br>uint16 force：1～1000,representing the gripping force of the gripper, maximum 1.5 kg.<br>bool block: whether it is a blocking mode, bool type, true: blocking, false: non-blocking. |
+| Command example | ros2 topic pub --once /rm_driver/set_gripper_pick_on_cmd rm_ros_interfaces/msg/Gripperpick "speed: 200<br>force: 200<br>block: true<br>timeout: 1000" |
 | Return value | Successful return: true; failure returns: false, the driver terminal returns an error code. |
 | Return example | ros2 topic echo /rm_driver/set_gripper_pick_on_result |
 #### Setting_the_gripper_to_the_given_position
 | Function description | Setting the gripper to the given position |
 | :---: | :---- |
-| Parameter description | Gripperset.msg<br>uint16 position：target position of the gripper, range: 1-1000, representing the opening degree of the gripper: 0-70 mm.<br>bool block: whether it is a blocking mode, bool type, true: blocking, false: non-blocking. <br>uint16 timeout:Set the return timeout time, and the blocking mode takes effect (in seconds).|
-| Command example | ros2 topic pub --once /rm_driver/set_gripper_position_cmd rm_ros_interfaces/msg/Gripperset "position: 500<br>block: true<br>timeout: 100" |
+| Parameter description | Gripperset.msg<br>uint16 position：target position of the gripper, range: 1-1000, representing the opening degree of the gripper: 0-70 mm.<br>bool block: whether it is a blocking mode, bool type, true: blocking, false: non-blocking. |
+| Command example | ros2 topic pub --once /rm_driver/set_gripper_position_cmd rm_ros_interfaces/msg/Gripperset "position: 500<br>block: true<br>timeout: 1000" |
 | Return value | Successful return: true; failure returns: false, the driver terminal returns an error code. |
 | Return example | ros2 topic echo /rm_driver/set_gripper_position_result |
 ### Functions_related_to_the_drag_teach_and_trajectory_reproduction
@@ -407,6 +418,20 @@ The RealMan RM-65 robotic arm has been equipped with a five-finger dexterous han
 | Command example | ros2 topic pub --once /rm_driver/set_hand_force_cmd rm_ros_interfaces/msg/Handforce "hand_force: 200<br>block: true" |
 | Return value | Successful return: true; failure returns: false, the driver terminal returns an error code. |
 | Return example | ros2 topic echo /rm_driver/set_hand_force_result |
+#### Setting_the_angle_following_of_the_dexterous_hand
+| Function description | Setting the angle following of the dexterous hand |
+| :---: | :---- |
+| Parameter description | Handangle.msg<br>int16[6] hand_angle：hand angle array, the range is 0 to 2000, and -1 represents that no operation is performed on this degree of freedom and the current state remains.<br>bool data: whether it is a blocking mode, bool type, true: blocking, false: non-blocking. |
+| Command example | ros2 topic pub --once /rm_driver/set_hand_follow_angle_cmd rm_ros_interfaces/msg/Handangle "hand_angle:<br>- 0<br>- 0<br>- 0<br>- 0<br>- 0<br>- 0<br>block: true" |
+| Return value | Successful return: true; failure returns: false, the driver terminal returns an error code. |
+| Return example | ros2 topic echo /rm_driver/set_hand_follow_angle_result |
+#### Setting_the_posture_following_of_the_dexterous_hand
+| Function description | Setting the posture following of the dexterous hand |
+| :---: | :---- |
+| Parameter description | Handangle.msg<br>int16[6] hand_angle：hand posture array, the range is 0 to 1000, and -1 represents that no operation is performed on this degree of freedom and the current state remains.<br>bool data: whether it is a blocking mode, bool type, true: blocking, false: non-blocking. |
+| Command example | ros2 topic pub --once /rm_driver/set_hand_follow_pos_cmd rm_ros_interfaces/msg/Handangle "hand_angle:<br>- 0<br>- 0<br>- 0<br>- 0<br>- 0<br>- 0<br>block: true" |
+| Return value | Successful return: true; failure returns: false, the driver terminal returns an error code. |
+| Return example | ros2 topic echo /rm_driver/set_hand_follow_pos_result |
 ### Lifting_mechanism
 The RealMan robotic arm can be integrated with the self-developed lifting mechanism.
 #### Speed_open-loop_control_of_the_lifting_mechanism
@@ -420,7 +445,7 @@ The RealMan robotic arm can be integrated with the self-developed lifting mechan
 | Function description | Position closed-loop control of the lifting mechanism |
 | :---: | :---- |
 | Parameter description | Liftheight.msg<br>uint16 height： target height, unit: mm, range: 0-2600.<br>uint16 speed：speed percentage, 1-100.<br>bool data: whether it is a blocking mode, bool type, true: blocking, false: non-blocking. |
-| Command example | ros2 topic pub --once /rm_driver/set_lift_height_cmd rm_ros_interfaces/msg/Liftheight "height: 10<br>speed: 10<br>block: true" |
+| Command example | ros2 topic pub --once /rm_driver/set_lift_height_cmd rm_ros_interfaces/msg/Liftheight "height: 0<br>speed: 10<br>block: true" |
 | Return value | Successful return: true; failure returns: false, the driver terminal returns an error code. |
 | Return example | ros2 topic echo /rm_driver/set_lift_height_result |
 #### Get_the_lifting_mechanism_state
@@ -546,3 +571,9 @@ If force data calibration has not been completed before the force operations, th
 | Parameter description | std_msgs::msg::UInt16<br>uint16 data：: coordinate system for external force data of the system, where 0 is the sensor coordinate system, 1 is the current work coordinate system, and 2 is the current tool coordinate system This data affects the reference coordinate system for external force data of one-axis and six axis force sensor systems. |
 | Subscription command | ros2 topic echo /rm_driver/udp_arm_coordinate |
 
+* The current state of dexterous dexterity
+
+| Function description | The current state of dexterous dexterity |
+| :----: | :---- |
+| Parameter description | rm_ros_interfaces::msg::Handstatus.msg<br>uint16[6] hand_angle：#Finger angle array，range：0~2000.<br>uint16[6] hand_pos：#Finger position array，range：0~1000.<br>uint16[6] hand_state：#Finger state,0 is releasing, 1 is grasping, 2 positions are in place and stop, 3 forces are in place and stop, 5 current protection stops, 6 electric cylinder stalling stops, 7 electric cylinder failure stops.<br>uint16[6] hand_force：#Dexterous hand degree of freedom current，unit mN.<br>uint16  hand_err：#Agile Hand System Error，1 indicates an error, 0 indicates no error. |
+| Subscription command | ros2 topic echo /rm_driver/udp_hand_status |
