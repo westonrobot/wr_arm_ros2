@@ -119,13 +119,13 @@ typedef struct
     float    work_zero_force[6];       //当前工作坐标系下系统受到的外力数据
     float    tool_zero_force[6];       //当前该工具坐标系下系统受到的外力数据
     float    one_zero_force;           //一维力基准坐标系下系统受力数据
-    uint16_t control_version;          //版本信息
-    uint16_t coordinate;               //当前六维力传感器的基准坐标
-    uint16_t hand_angle[6];            //手指角度数组，范围：0~2000.
-    uint16_t hand_pos[6];              //手指位置数组，范围：0~1000.
-    uint16_t hand_state[6];            //手指状态,0正在松开，1正在抓取，2位置到位停止，3力到位停止，5电流保护停止，6电缸堵转停止，7电缸故障停止
-    uint16_t hand_force[6];            //灵巧手自由度电流，单位mN
-    uint16_t hand_err;                 //灵巧手系统错误，1表示有错误，0表示无错误
+    int      control_version;          //版本信息
+    int      coordinate;               //当前六维力传感器的基准坐标
+    int      hand_angle[6];            //手指角度数组，范围：0~2000.
+    int      hand_pos[6];              //手指位置数组，范围：0~1000.
+    int      hand_state[6];            //手指状态,0正在松开，1正在抓取，2位置到位停止，3力到位停止，5电流保护停止，6电缸堵转停止，7电缸故障停止
+    int      hand_force[6];            //灵巧手自由度电流，单位mN
+    int      hand_err;                 //灵巧手系统错误，1表示有错误，0表示无错误
 } JOINT_STATE_VALUE;
 JOINT_STATE_VALUE Udp_RM_Joint;
 
