@@ -501,7 +501,6 @@ void RmArm::Arm_Get_Realtime_Push_Callback(const std_msgs::msg::Empty::SharedPtr
         Setrealtime_msg.force_coordinate = config.force_coordinate;
         Setrealtime_msg.ip = config.ip;
         Setrealtime_msg.hand_enable = config.custom.hand_state;
-        RCLCPP_INFO (this->get_logger(),"The error code is %d\n",config.custom.hand_state);
         udp_hand_g = config.custom.hand_state;
         this->Get_Realtime_Push_Result->publish(Setrealtime_msg);
     }
