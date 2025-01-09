@@ -7,7 +7,7 @@
 
 <div align="center">
 
-# 睿尔曼机械臂接口函数说明(ROS2)V1.1.3
+# 睿尔曼机械臂接口函数说明(ROS2)V1.1.4
 
 
  
@@ -24,6 +24,7 @@
 |V1.1.1| 2024-8-13| 修订（添加查询六维力数据）|
 |V1.1.2| 2024-9-25| 修订（修正坐标系话题描述错误）|
 |V1.1.3| 2024-10-31|修订（添加灵巧手UDP功能，跟随功能）|
+|V1.1.4| 2024-12-25|修订（修改UDP上报内容）|
 
 </div>
 
@@ -51,9 +52,11 @@
 * 3.5.2[笛卡尔空间直线运动](#笛卡尔空间直线运动)
 * 3.5.3[笛卡尔空间圆弧运动](#笛卡尔空间圆弧运动)
 * 3.5.4[关节角度CANFD透传](#关节角度CANFD透传)
-* 3.5.5[位姿CANFD透传](#位姿CANFD透传)
-* 3.5.6[关节空间规划到目标位姿](#关节空间规划到目标位姿)
-* 3.5.7[轨迹急停](#轨迹急停)
+* 3.5.5[自定义高跟随模式关节角度CANFD透传](#自定义高跟随关节角度CANFD透传)
+* 3.5.6[位姿CANFD透传](#位姿CANFD透传)
+* 3.5.7[自定义高跟随模式位姿CANFD透传](#自定义高跟随模式位姿CANFD透传)
+* 3.5.8[关节空间规划到目标位姿](#关节空间规划到目标位姿)
+* 3.5.9[轨迹急停](#轨迹急停)
 * 3.6[示教指令](#示教指令)
 * 3.6.1[关节示教](#关节示教)
 * 3.6.2[位置示教](#位置示教)
@@ -262,12 +265,24 @@
 | 参数说明 | Jointpos.msg<br>float32[6] joint：关节角度，单位：弧度。<br>bool follow：跟随状态，true高跟随，false低跟随，不设置默认高跟随。<br>float32 expand：拓展关节，单位：弧度。 |
 | 命令示例 | 透传需要连续发送多个连续的点实现，单纯靠以下命令并不能实现功能，当前moveit2控制使用了角度透传的控制方式。<br>ros2 topic pub /rm_driver/movej_canfd_cmd rm_ros_interfaces/msg/Jointpos "joint: [0, 0, 0, 0, 0, 0]<br>follow: false<br>expand: 0.0<br>dof: 6" |
 | 返回值 | 成功：无返回值；失败返回：driver终端返回错误码。 |
+#### 自定义高跟随模式关节角度CANFD透传
+| 功能描述 | 自定义高跟随模式关节角度CANFD透传 |
+| :---: | :---- |
+| 参数说明 | Jointposcustom.msg<br>float32[6] joint：关节角度，单位：弧度。<br>bool follow：跟随状态，true高跟随，false低跟随，不设置默认高跟随。<br>float32 expand：拓展关节，单位：弧度。<br>uint8 trajectory_mode: 高跟随模式下，支持多种模式，0-完全透传模式、1-曲线拟合模式、2-滤波模式。<br>uint8 radio: 设置曲线拟合模式下平滑系数（范围0-100）或者滤波模式下的滤波参数（范围0-1000），数值越大表示平滑效果越好 |
+| 命令示例 | 透传需要连续发送多个连续的点实现，单纯靠以下命令并不能实现功能，当前moveit2控制使用了角度透传的控制方式。<br>ros2 topic pub /rm_driver/movej_canfd_custom_cmd rm_ros_interfaces/msg/Jointposcustom "joint: [0, 0, 0, 0, 0, 0]<br>follow: false<br>expand: 0.0<br>trajectory_mode: 0<br>radio: 0<br>dof: 6" |
+| 返回值 | 成功：无返回值；失败返回：driver终端返回错误码。 |
 	
 #### 位姿CANFD透传
 | 功能描述 | 位姿CANFD透传 |
 | :---: | :---- |
-| 参数说明 | Jointpos.msg<br>geometry_msgs/Pose pose：透传位姿，geometry_msgs/Pose类型，x、y、z坐标(float类型，单位：m)+四元数。<br>bool follow：跟随状态，true高跟随，false低跟随，不设置默认高跟随。 |
+| 参数说明 | Cartepos.msg<br>geometry_msgs/Pose pose：透传位姿，geometry_msgs/Pose类型，x、y、z坐标(float类型，单位：m)+四元数。<br>bool follow：跟随状态，true高跟随，false低跟随，不设置默认高跟随。 |
 | 命令示例 | 需要是大量(10个以上)位置连续 的点，单纯靠以下命令并不能实现功能，以2ms以上的周期持续发布。<br>ros2 topic pub /rm_driver/movep_canfd_cmd rm_ros_interfaces/msg/Cartepos "pose:<br>  position:<br>    x: 0.0<br>    y: 0.0<br>    z: 0.0<br>  orientation:<br>    x: 0.0<br>    y: 0.0<br>    z: 0.0<br>    w: 1.0<br>follow: false" |
+| 返回值 | 成功：无返回值；失败返回：driver终端返回错误码。 |
+#### 自定义高跟随模式位姿CANFD透传
+| 功能描述 | 自定义高跟随模式位姿CANFD透传 |
+| :---: | :---- |
+| 参数说明 | Carteposcustom.msg<br>geometry_msgs/Pose pose：透传位姿，geometry_msgs/Pose类型，x、y、z坐标(float类型，单位：m)+四元数。<br>bool follow：跟随状态，true高跟随，false低跟随，不设置默认高跟随。 <br>uint8 trajectory_mode: 高跟随模式下，支持多种模式，0-完全透传模式、1-曲线拟合模式、2-滤波模式。<br>uint8 radio: 设置曲线拟合模式下平滑系数（范围0-100）或者滤波模式下的滤波参数（范围0-1000），数值越大表示平滑效果越好|
+| 命令示例 | 需要是大量(10个以上)位置连续 的点，单纯靠以下命令并不能实现功能，以2ms以上的周期持续发布。<br>ros2 topic pub /rm_driver/movep_canfd_custom_cmd rm_ros_interfaces/msg/Carteposcustom  <br>"pose:<br>  position:<br>    x: 0.0<br>    y: 0.0<br>    z: 0.0<br>  orientation:<br>    x: 0.0<br>    y: 0.0<br>    z: 0.0<br>    w: 1.0<br>follow: false<br> trajectory_mode: 0<br>radio: 0" |
 | 返回值 | 成功：无返回值；失败返回：driver终端返回错误码。 |
 #### 关节空间规划到目标位姿
 | 功能描述 | 关节空间规划到目标位姿MOVEJP |
@@ -489,8 +504,8 @@
 #### 设置UDP机械臂状态主动上报配置
 | 功能描述 | 设置UDP 机械臂状态主动上报配置 |
 | :---: | :---- |
-| 参数说明 | Setrealtimepush.msg<br>uint16 cycle：设置广播周期，为5ms的倍数(默认1即1*5=5ms,200Hz)。<br>uint16 port：设置广播的端口号(默认8089)。<br>uint16 force_coordinate：设置系统外受力数据的坐标系(仅带有力传感器的机械臂支持)。<br>string ip：设置自定义的上报目标IP 地址(默认192.168.1.10)<br>bool hand_enable：是否使能灵巧手状态上报，true使能，false不使能。 |
-| 命令示例 | ros2 topic pub --once /rm_driver/set_realtime_push_cmd rm_ros_interfaces/msg/Setrealtimepush "cycle: 1<br>port: 8089<br>force_coordinate: 0<br>ip: '192.168.1.10'<br>hand_enable: false" |
+| 参数说明 | Setrealtimepush.msg<br>uint16 cycle：设置广播周期，为5ms的倍数(默认1即1*5=5ms,200Hz)。<br>uint16 port：设置广播的端口号(默认8089)。<br>uint16 force_coordinate：设置系统外受力数据的坐标系(仅带有力传感器的机械臂支持)。<br>string ip：设置自定义的上报目标IP 地址(默认192.168.1.10)<br>bool hand_enable：是否使能灵巧手状态上报，true使能，false不使能。<br>aloha_state_enable: 是否使能aloha主臂状态上报，true使能，false不使能。<br>arm_current_status_enable: 是否使能机械臂状态上报，true使能，false不使能。<br>expand_state_enable: 是否使能扩展关节相关数据上报，true使能，false不使能。<br>joint_speed_enable: 是否使能关节速度上报，true使能，false不使能。<br>lift_state_enable: 是否使能升降关节数据上报，true使能，false不使能。" |
+| 命令示例 | ros2 topic pub --once /rm_driver/set_realtime_push_cmd rm_ros_interfaces/msg/Setrealtimepush "cycle: 1<br>port: 8089<br>force_coordinate: 0<br>ip: '192.168.1.10'<br>hand_enable: false<br>aloha_state_enable: false<br>arm_current_status_enable: false<br>expand_state_enable: false<br>joint_speed_enable: false<br>lift_state_enable: false" |
 | 返回值 | 成功返回：true；失败返回：false，driver终端返回错误码。 |
 | 返回查询示例 | ros2 topic echo /rm_driver/set_realtime_push_result |
 #### 查询UDP机械臂状态主动上报配置
@@ -578,3 +593,50 @@
 | :----: | :---- |
 | 参数说明 | rm_ros_interfaces::msg::Handstatus.msg<br>uint16[6] hand_angle：#手指角度数组，范围：0~2000.<br>uint16[6] hand_pos：#手指位置数组，范围：0~1000.<br>uint16[6] hand_state：#手指状态,0正在松开，1正在抓取，2位置到位停止，3力到位停止，5电流保护停止，6电缸堵转停止，7电缸故障停止.<br>uint16[6] hand_force：#灵巧手自由度电流，单位mN.<br>uint16  hand_err：#灵巧手系统错误，1表示有错误，0表示无错误. |
 | 查询示例 | ros2 topic echo /rm_driver/udp_hand_status |
+* 机械臂当前状态
+
+| 功能描述 | 获取机械臂当前状态 |
+| :----: | :---- |
+| 参数说明 | rm_ros_interfaces::msg::Armcurrentstatus.msg<br>uint16 arm_current_status：机械臂状态<br>0 - RM_IDLE_E // 使能但空闲状态<br>1 - RM_MOVE_L_E // move L运动中状态<br>2 - RM_MOVE_J_E // move J运动中状态 <br>3 - RM_MOVE_C_E // move C运动中状态 <br>4 - RM_MOVE_S_E // move S运动中状态 <br>5 - RM_MOVE_THROUGH_JOINT_E // 角度透传状态 <br>6 - RM_MOVE_THROUGH_POSE_E  // 位姿透传状态 <br>7 - RM_MOVE_THROUGH_FORCE_POSE_E // 力控透传状态 <br>8 - RM_MOVE_THROUGH_CURRENT_E // 电流环透传状态 <br>9 - RM_STOP_E             // 急停状态 <br>10 - RM_SLOW_STOP_E        // 缓停状态 <br>11 - RM_PAUSE_E            // 暂停状态 <br>12 - RM_CURRENT_DRAG_E     // 电流环拖动状态 <br>13 - RM_SENSOR_DRAG_E      // 六维力拖动状态 <br>14 - RM_TECH_DEMONSTRATION_E // 示教状态 |
+| 查询示例 | ros2 topic echo /rm_driver/udp_arm_current_status |
+
+* 当前关节电流
+
+| 功能描述 | 当前关节电流 |
+| :----: | :---- |
+| 参数说明 | rm_ros_interfaces::msg::Jointcurrent.msg<br>float32[] joint_current: 当前关节电流，精度 0.001mA |
+| 查询示例 | ros2 topic echo /rm_driver/udp_joint_current |
+
+* 当前关节使能状态
+
+| 功能描述 | 当前关节使能状态 |
+| :----: | :---- |
+| 参数说明 | rm_ros_interfaces::msg::Jointenflag.msg<br>bool[] joint_en_flag: 当前关节使能状态 ，1 为上使能，0 为掉使能|
+| 查询示例 | ros2 topic echo /rm_driver/udp_joint_en_flag |
+
+* 机械臂欧拉角位姿
+
+| 功能描述 | 机械臂欧拉角位姿 |
+| :----: | :---- |
+| 参数说明 | rm_ros_interfaces::msg::Jointposeeuler.msg<br>float32[3] euler: 当前路点姿态欧拉角，精度 0.001rad<br>float32[3] position：当前路点位置，精度 0.000001M|
+| 查询示例 | ros2 topic echo /rm_driver/udp_joint_pose_euler |
+
+* 当前关节速度
+
+| 功能描述 | 当前关节速度 |
+| :----: | :---- |
+| 参数说明 | rm_ros_interfaces::msg::Jointspeed.msg<br>float32[] joint_speed: 当前关节速度，精度0.02RPM。|
+| 查询示例 | ros2 topic echo /rm_driver/udp_joint_speed |
+
+* 当前关节温度
+
+| 功能描述 | 当前关节温度 |
+| :----: | :---- |
+| 参数说明 | rm_ros_interfaces::msg::Jointtemperature.msg<br>float32[] joint_temperature: 当前关节温度，精度 0.001℃|
+| 查询示例 | ros2 topic echo /rm_driver/udp_joint_temperature |
+* 当前关节电压
+
+| 功能描述 | 当前关节电压 |
+| :----: | :---- |
+| 参数说明 | rm_ros_interfaces::msg::Jointvoltage.msg<br>float32[] joint_voltage: 当前关节电压，精度 0.001V|
+| 查询示例 | ros2 topic echo /rm_driver/udp_joint_voltage |

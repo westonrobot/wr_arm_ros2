@@ -6,7 +6,7 @@
 
 <div align="center">
 
-# RealMan Robotrm_controlUser Manual V1.2
+# RealMan Robot rm_bringup User Manual V1.3
 
 RealMan Intelligent Technology (Beijing) Co., Ltd. 
 
@@ -17,6 +17,7 @@ Revision History:
 |V1.0	  | 2/19/2024 | Draft |
 |V1.1	  | 7/8 /2024 | Amend(Add GEN72 adapter files) |
 |V1.2 	  | 9/10 /2024| Amend(Add ECO63 adapter files) |
+|V1.3 	  | 25/12/2024| Amend(Add 63, 65, 75, ECO65 six-axis force adapter files and 63, 65, 75, ECO63, ECO65 integrated six-axis force adapter files) |
 
 </div>
 
@@ -44,7 +45,15 @@ First, after configuring the environment and completing the connection, we can d
 ```
 rm@rm-desktop:~$ ros2 launch rm_bringup rm_<arm_type>_bringup.launch.py
 ```
-In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65、eco63, gen72, and 75.  
+In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65, eco63, 75 and gen72.  
+The command to start the six-axis force version of the manipulator is (note: eco63 is not available):
+```
+rm@rm-desktop:~$ ros2 launch rm_bringup rm_<arm_type>_6f_bringup.launch.py
+```
+The command to start the integrated six-axis force version of the manipulator is :
+```
+rm@rm-desktop:~$ ros2 launch rm_bringup rm_<arm_type>_6fb_bringup.launch.py
+```
 For example, the launch command of 65 robotic arm:
 ```
 rm@rm-desktop:~$ ros2 launch rm_bringup rm_65_bringup.launch.py
@@ -60,14 +69,25 @@ The current rm_driver package is composed of the following files.
 ├── include
 │   └── rm_bringup
 ├── launch
+│   ├── rm_63_6f_bringup.launch.py     # 63 arm six-axis force moveit2 launch file
+│   ├── rm_63_6fb_bringup.launch.py    # 63 arm integrated six-axis force moveit2 launch file
 │   ├── rm_63_bringup.launch.py        # 63 arm moveit2 launch file
+│   ├── rm_65_6f_bringup.launch.py     # 65 arm six-axis force moveit2 launch file
+│   ├── rm_65_6fb_bringup.launch.py    # 65 arm integrated six-axis force moveit2 launch file
 │   ├── rm_65_bringup.launch.py        # 65 arm moveit2 launch file
+│   ├── rm_75_6f_bringup.launch.py     # 75 arm six-axis force moveit2 launch file
+│   ├── rm_75_6fb_bringup.launch.py    # 75 arm integrated six-axis force moveit2 launch file
 │   ├── rm_75_bringup.launch.py        # 75 arm moveit2 launch file
-│   ├── rm_eco65_bringup.launch.py     # eco65 arm moveit2 launch file
+│   ├── rm_eco63_6fb_bringup.launch.py # eco63 arm integrated six-axis force moveit2 launch file
 │   ├── rm_eco63_bringup.launch.py     # eco63 arm moveit2 launch file
+│   ├── rm_eco65_6f_bringup.launch.py  # eco65 arm six-axis force moveit2 launch file
+│   ├── rm_eco65_6fb_bringup.launch.py # eco65 arm integrated six-axis force moveit2 launch file
+│   ├── rm_eco65_bringup.launch.py     # eco65 arm moveit2 launch file
+
 │   └── rm_gen72_bringup.launch.py     # gen72 arm moveit2 launch file
 ├── package.xml
-└── src
+├── README_CN.md                  
+└── README.md                           
 ```
 ## rm_bringup_Topic_Description
 This package currently does not have its topic. It is mainly to call other packages. For the topics related to moveit2, please refer to "[rm_moveit2_config Detailed Description](https://github.com/kaola-zero/ros2_rm_robot/blob/main/rm_moveit2_config/README.md)".

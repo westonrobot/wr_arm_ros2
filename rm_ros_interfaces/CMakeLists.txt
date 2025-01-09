@@ -48,6 +48,15 @@ set(msg_files
   msg/Liftspeed.msg
   msg/Liftheight.msg
   msg/Liftstate.msg
+  msg/Armcurrentstatus.msg
+  msg/Jointcurrent.msg
+  msg/Jointenflag.msg
+  msg/Jointposeeuler.msg
+  msg/Jointspeed.msg
+  msg/Jointtemperature.msg
+  msg/Jointvoltage.msg
+  msg/Carteposcustom.msg
+  msg/Jointposcustom.msg
 )
 
 # uncomment the following section in order to fill in

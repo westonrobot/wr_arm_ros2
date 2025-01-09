@@ -7,7 +7,7 @@
 
 <div align="center">
 
-# RealMan Robotic Arm rm_driver Topic Detailed Description (ROS2) V1.1.3
+# RealMan Robotic Arm rm_driver Topic Detailed Description (ROS2) V1.1.4
 
 
  
@@ -24,6 +24,7 @@ Revision History:
 |V1.1.1| 2024-8-13| Amend(Add six-axis topic)           |
 |V1.1.2| 2024-9-25| Amend(revise coordinate topic description)|
 |V1.1.3| 2024-10-31|Amend(Add Agile Hand UDP Adaptation,Follow Adaptation)|
+|V1.1.4| 2024-12-25|Amend(Modify UDP report content)|
 
 </div>
 
@@ -51,9 +52,11 @@ Revision History:
 * 3.5.2[Linear motion in Cartesian space](#Linear_motion_in_Cartesian_space)
 * 3.5.3[Circular motion in Cartesian space](#Circular_motion_in_Cartesian_space)
 * 3.5.4[Joint angle CANFD transmission](#Joint_angle_CANFD_transmission)
-* 3.5.5[Pose CANFD transmission](#Pose_CANFD_transmission)
-* 3.5.6[Joint space planning to target pose](#Joint_space_planning_to_target_pose)
-* 3.5.7[Trajectory emergency stop](#Trajectory_emergency_stop)
+* 3.5.5[Customize high following mode joint angle CANFD transmission](#Customize_high_following_mode_joint_angle_CANFD_transmission)
+* 3.5.6[Pose CANFD transmission](#Pose_CANFD_transmission)
+* 3.5.7[Customize high following mode pose CANFD transmission](#Customize_high_following_mode_pose_CANFD_transmission)
+* 3.5.8[Joint space planning to target pose](#Joint_space_planning_to_target_pose)
+* 3.5.9[Trajectory emergency stop](#Trajectory_emergency_stop)
 * 3.6[Teaching instructions](#Teaching_instructions)
 * 3.6.1[Joint teaching](#Joint_teaching)
 * 3.6.2[Position teaching](#Position_teaching)
@@ -262,12 +265,24 @@ This section describes how to query and control the robotic arm through the topi
 | Parameter description | Jointpos.msg<br>float32[6] joint：joint angle, unit: radians.<br>bool follow：follow state, true: high following, false: low following, default high following if not set.<br>float32 expand：expand joint, unit: radians. |
 | Command example | Transmission needs to send multiple continuous points to achieve, simply by the following command and can not achieve the function, the current moveit2 control using angle transmission control mode.<br>ros2 topic pub /rm_driver/movej_canfd_cmd rm_ros_interfaces/msg/Jointpos "joint: [0, 0, 0, 0, 0, 0]<br>follow: false<br>expand: 0.0<br>dof: 6" |
 | Return value | Success: no return value; Failure return: the driver terminal returns an error code. |
+#### Customize_high_following_mode_joint_angle_CANFD_transmission
+| Function description | Customize high following mode joint angle CANFD transmission |
+| :---: | :---- |
+| Parameter description | Jointposcustom.msg<br>float32[6] joint：joint angle, unit: radians.<br>bool follow：follow state, true: high following, false: low following, default high following if not set.<br>float32 expand：expand joint, unit: radians. <br>uint8 trajectory_mode：When the high following mode is set, multiple modes are supported, including 0- complete transparent transmission mode, 1- curve fitting mode and 2- filtering mode.<br>uint8 radio：Set the smoothing coefficient in curve fitting mode (range 0-100) or the filter parameter in filtering mode (range 0-1000). The higher the value, the better the smoothing effect.|
+| Command example | Transmission needs to send multiple continuous points to achieve, simply by the following command and can not achieve the function, the current moveit2 control using angle transmission control mode.<br>ros2 topic pub /rm_driver/movej_canfd_custom_cmd rm_ros_interfaces/msg/Jointposcustom "joint: [0, 0, 0, 0, 0, 0]<br>follow: false<br>expand: 0.0<br>trajectory_mode: 0<br>radio: 0<br>dof: 6" |
+| Return value | Success: no return value; Failure return: the driver terminal returns an error code. |
 	
 #### Pose_CANFD_transmission
 | Function description | Pose CANFD transmission |
 | :---: | :---- |
-| Parameter description | Jointpos.msg<br>geometry_msgs/Pose pose: transmission pose, geometry_msgs/Pose type, x, y, z coordinates (float type, unit: m) + quaternion.<br>bool  follows: follow state, true: high following, false: low following, default high following if not set. |
+| Parameter description | Cartepos.msg<br>geometry_msgs/Pose pose: transmission pose, geometry_msgs/Pose type, x, y, z coordinates (float type, unit: m) + quaternion.<br>bool  follows: follow state, true: high following, false: low following, default high following if not set. |
 | Command example | It needs to be a large number (10 or more) of continuous position points, simply by the following command and can not achieve the function, with more than a 2ms period continuous release.<br>ros2 topic pub /rm_driver/movep_canfd_cmd rm_ros_interfaces/msg/Cartepos "pose:<br>  position:<br>    x: 0.0<br>    y: 0.0<br>    z: 0.0<br>  orientation:<br>    x: 0.0<br>    y: 0.0<br>    z: 0.0<br>    w: 1.0<br>follow: false" |
+| Return value | Success: no return value; Failure return: the driver terminal returns an error code. |
+#### Customize_high_following_mode_pose_CANFD_transmission
+| Function description | Customize high following mode pose CANFD transmission |
+| :---: | :---- |
+| Parameter description | Carteposcustom.msg<br>geometry_msgs/Pose pose: transmission pose, geometry_msgs/Pose type, x, y, z coordinates (float type, unit: m) + quaternion.<br>bool  follows: follow state, true: high following, false: low following, default high following if not set. <br>uint8 trajectory_mode：When the high following mode is set, multiple modes are supported, including 0- complete transparent transmission mode, 1- curve fitting mode and 2- filtering mode.<br>uint8 radio：Set the smoothing coefficient in curve fitting mode (range 0-100) or the filter parameter in filtering mode (range 0-1000). The higher the value, the better the smoothing effect.|
+| Command example | It needs to be a large number (10 or more) of continuous position points, simply by the following command and can not achieve the function, with more than a 2ms period continuous release.<br>ros2 topic pub /rm_driver/movep_canfd_custom_cmd rm_ros_interfaces/msg/Carteposcustom "pose:<br>  position:<br>    x: 0.0<br>    y: 0.0<br>    z: 0.0<br>  orientation:<br>    x: 0.0<br>    y: 0.0<br>    z: 0.0<br>    w: 1.0<br>follow: false<br> trajectory_mode: 0<br>radio: 0" |
 | Return value | Success: no return value; Failure return: the driver terminal returns an error code. |
 #### Joint_space_planning_to_target_pose
 | Function description | Joint space planning to target pose MOVEJP |
@@ -488,8 +503,8 @@ If force data calibration has not been completed before the force operations, th
 #### Setting_UDP_robotic_arm_state_active_reporting_configuration
 | Function description | Set UDP robotic arm state active reporting configuration |
 | :---: | :---- |
-| Parameter description | Setrealtimepush.msg<br>uint16 cycle：set the broadcast cycle, which is a multiple of 5ms (default 1 i.e. 1 * 5 = 5 ms, 200 Hz).<br>uint16 port：set the broadcast port number (default 8089).<br>uint16 force_coordinate：set the coordinate system of force data outside the system (only supported by the arm with force sensors).<br>string ip：set the custom reporting target IP address (default 192.168.1.10). |
-| Command example | ros2 topic pub --once /rm_driver/set_realtime_push_cmd rm_ros_interfaces/msg/Setrealtimepush "cycle: 1<br>port: 8089<br>force_coordinate: 0<br>ip: '192.168.1.10'" |
+| Parameter description | Setrealtimepush.msg<br>uint16 cycle：set the broadcast cycle, which is a multiple of 5ms (default 1 i.e. 1 * 5 = 5 ms, 200 Hz).<br>uint16 port：set the broadcast port number (default 8089).<br>uint16 force_coordinate：set the coordinate system of force data outside the system (only supported by the arm with force sensors).<br>string ip：set the custom reporting target IP address (default 192.168.1.10). <br>bool hand_enable: whether dexterous hand status reporting is enabled, true is enabled, and false is not enabled. <br>aloha_state_enable: whether to enable aloha main arm status reporting, true to enable, false not to enable. <br>arm_current_status_enable: whether to enable the status report of the robot arm, true to enable, false not to enable. <br>expand_state_enable: whether to enable the report of extended joint related data, true is enabled, false is not enabled. <br>joint_speed_enable: whether joint speed reporting is enabled, true is enabled, and false is not enabled. <br>lift_state_enable: whether lifting joint data reporting is enabled, true is enabled, and false is not enabled.|
+| Command example | ros2 topic pub --once /rm_driver/set_realtime_push_cmd rm_ros_interfaces/msg/Setrealtimepush "cycle: 1<br>port: 8089<br>force_coordinate: 0<br>ip: '192.168.1.10'<br>hand_enable: false<br>aloha_state_enable: false<br>arm_current_status_enable: false<br>expand_state_enable: false<br>joint_speed_enable: false<br>lift_state_enable: false" |
 | Return value | Successful return: true; failure returns: false, the driver terminal returns an error code. |
 | Return example | ros2 topic echo /rm_driver/set_realtime_push_result |
 #### Getting_UDP_robotic_arm_state_active_reporting_configuration
@@ -571,9 +586,56 @@ If force data calibration has not been completed before the force operations, th
 | Parameter description | std_msgs::msg::UInt16<br>uint16 data：: coordinate system for external force data of the system, where 0 is the sensor coordinate system, 1 is the current work coordinate system, and 2 is the current tool coordinate system This data affects the reference coordinate system for external force data of one-axis and six axis force sensor systems. |
 | Subscription command | ros2 topic echo /rm_driver/udp_arm_coordinate |
 
+
 * The current state of dexterous dexterity
 
 | Function description | The current state of dexterous dexterity |
 | :----: | :---- |
 | Parameter description | rm_ros_interfaces::msg::Handstatus.msg<br>uint16[6] hand_angle：#Finger angle array，range：0~2000.<br>uint16[6] hand_pos：#Finger position array，range：0~1000.<br>uint16[6] hand_state：#Finger state,0 is releasing, 1 is grasping, 2 positions are in place and stop, 3 forces are in place and stop, 5 current protection stops, 6 electric cylinder stalling stops, 7 electric cylinder failure stops.<br>uint16[6] hand_force：#Dexterous hand degree of freedom current，unit mN.<br>uint16  hand_err：#Agile Hand System Error，1 indicates an error, 0 indicates no error. |
 | Subscription command | ros2 topic echo /rm_driver/udp_hand_status |
+* current status of the mechanical arm
+
+| Function Description | Get the current status of the mechanical arm |
+| :----: | :---- |
+| parameter description | rm_ros_interfaces:: msg:: Armcurrentstatus.msg <br> uint16arm _ current _ status: mechanical arm status <br>0-RM_IDLE_E // enabled but idle status <br>1-RM_MOVE_L_E // Move L moving state <br>2-RM_MOVE_J_E // move J moving state <br>3-RM_MOVE_C_E // move C moving state <br>4-RM_MOVE_S_E // move S moving state <br> 5-RM _ move _ /angle transmission state <br>6-RM_MOVE_THROUGH_POSE_E // posture transmission state <br> 7-RM _ move _ through _ force _ pose _ e//force control transmission state <br> 8-RM _ move _ through _ current _ e// Current loop transparent state <br>9-RM_STOP_E // emergency stop state <br>10-RM_SLOW_STOP_E // slow stop state <br>11-RM_PAUSE_E // Pause state <br>12-RM_CURRENT_DRAG_E // Current loop drag state <br>13-RM_SENSOR_DRAG_E // Six-axis force drag state <br> 14-RM _ tech _ demonstration _ e//Teaching state |
+| query example | ros2 topic echo /rm_ driver/udp _ arm _ current _ status |
+* Current joint current
+
+| Function Description | Current Joint Current |
+| :----: | :---- |
+| parameter description | rm_ros_interfaces:: msg:: Jointcurrent.msg <br> float 32 [] joint _ current: current joint current with accuracy of 0.001mA |
+| query example | ros2 topic echo /rm_ driver/udp _ joint _ current |
+
+* The current joint enabling state
+
+| Function Description | Current Joint Enabling Status |
+| :----: | :---- |
+| parameter description | rm_ros_interfaces:: msg:: Jointenflag.msg <br> bool [] joint _ en _ flag: the current joint enabling state, where 1 is the upper enabling state and 0 is the lower enabling state |
+| query example | ros2 topic echo /rm_ driver/udp _ joint _ en _ flag |
+
+* Euler angle posture of mechanical arm
+
+| Function Description | Euler Angle Pose of Mechanical Arm |
+| :----: | :---- |
+| parameter description | rm_ros_interfaces:: msg:: Jointposeeuler.msg <br> float 32 [3] Euler: Euler angle of current waypoint attitude with accuracy of 0.001rad<br>float32[3] position: current waypoint position with accuracy of 0.000001M|
+| query example | ros2 topic echo /rm_ driver/udp _ joint _ pose _ Euler |
+
+* Current joint speed
+
+| Function Description | Current joint speed |
+| :----: | :---- |
+| parameter description | rm_ros_interfaces:: msg:: Jointspeed.msg <br> float 32 [] joint _ speed: current joint speed with an accuracy of 0.02RPM. |
+| query example | ros2 topic echo /rm_ driver/udp _ joint _ speed |
+
+* Current joint temperature
+
+| Function Description | Current joint temperature |
+| :----: | :---- |
+| parameter description | rm_ros_interfaces:: msg:: Jointtemperature.msg <br> float 32 [] joint_temperature: current joint temperature with accuracy of 0.001℃|
+| query example | ros2 topic echo /rm_ driver/udp _ joint _ temperature |
+* Current joint voltage
+
+| Function Description | Current Joint Voltage |
+| :----: | :---- |
+| parameter description | rm_ros_interfaces:: msg:: Jointvoltage.msg <br> float 32 [] joint _ voltage: current joint voltage with accuracy of 0.001V|
+| query example | ros2 topic echo /rm_ driver/udp _ joint _ voltage |

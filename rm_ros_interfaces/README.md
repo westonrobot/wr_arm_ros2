@@ -7,7 +7,7 @@
 
 <div align="center">
 
-# RealMan Robot rm_ros_interface User Manual V1.1
+# RealMan Robot rm_ros_interface User Manual V1.2
 
 
  
@@ -21,6 +21,8 @@ Revision History-
 | -----| -----| -----|
 |V1.0 | 2-18-2024 | Draft |
 |V1.1 | 7-8-2024  | Amend(Add teaching message) |
+|V1.2 | 12-25-2024  | Amend(Add UDP report message) |
+
 
 </div>
 
@@ -61,7 +63,15 @@ Revision History-
 * 4.29[Position closed-loop control-lifting mechanism-Lift height_msg](#Position_closed-loop_control-lifting_mechanism-Lift_height_msg)
 * 4.30[Getting the state of the lifting mechanism-Liftstate_msg](#Getting_the_state_of_the_lifting_mechanism-Liftstate_msg)
 * 4.31[Getting or setting UDP active reporting configuration-Setrealtimepush_msg](#Getting_or_setting_UDP_active_reporting_configuration-Setrealtimepush_msg)
-
+* 4.32[UDP manipulator status report Armcurrentstatus_msg](#UDP_manipulator_status_report-Armcurrentstatus_msg)
+* 4.33[UDP joint current report Jointcurrent_msg](#UDP_joint_current_report-Jointcurrent_msg)
+* 4.34[UDP joint enabling status report Jointenflag_msg](#UDP_joint_enabling_status_report-Jointenflag_msg)
+* 4.35[UDP manipulator Euler's angular pose is reported to Jointposeeuler_msg](#UDP_manipulator_Euler's_angular_pose_is_reported_to-Jointposeeuler_msg)
+* 4.36[UDP joint speed report Jointspeed_msg](#UDP_joint_speed_report_Jointspeed_msg)
+* 4.37[UDP joint temperature report Jointtemperature_msg](#UDP_joint_temperature_report_Jointtemperature_msg)
+* 4.38[UDP joint voltage report Jointvoltage_msg](#UUDP_joint_voltage_report_Jointvoltage_msg)
+* 4.39[Customize high following mode joint transmission-Jointposcustom_msg](#Customize_high_following_mode_joint_transmission-Jointposcustom_msg)
+* 4.40[Customize high following mode pose transmission-Carteposcustom_msg](#Customize_high_following_mode_pose_transmission-Carteposcustom_msg)
 
 ## rm_ros_interface_Package_Description
 The main function of the rm_ros_interface package is to provide necessary message files for the robotic arm to run under the framework of ROS2. In the following text, we will provide a detailed introduction to this package through the following aspects.
@@ -81,40 +91,49 @@ This package does not have any executable commands, but it is used to provide th
 ├── include                       # dependency header file folder
 │   └── rm_ros_interfaces
 ├── msg                          # current message file (see below for details)
-│   ├── Armoriginalstate_msg
-│   ├── Armsoftversion_msg
-│   ├── Armstate_msg
-│   ├── Cartepos_msg
-│   ├── Forcepositionmovejoint75_msg
-│   ├── Forcepositionmovejoint_msg
-│   ├── Forcepositionmovepose_msg
-│   ├── Force_Position_State_msg
-│   ├── Getallframe_msg
-│   ├── GetArmState_Command_msg
-│   ├── Gripperpick_msg
-│   ├── Gripperset_msg
-│   ├── Handangle_msg
-│   ├── Hand force_msg
-│   ├── Handposture_msg
-│   ├── Handseq_msg
-│   ├── Handspeed_msg
-│   ├── Jointerrclear_msg
-│   ├── Jointerrorcode75_msg
-│   ├── Jointerrorcode_msg
-│   ├── Jointpos75_msg
-│   ├── Jointpos_msg
-│   ├── Lift height_msg
-│   ├── Liftspeed_msg
-│   ├── Liftstate_msg
-│   ├── Movec_msg
-│   ├── Movej75_msg
-│   ├── Movej_msg
-│   ├── Movejp_msg
-│   ├── Movel_msg
-│   ├── Setforceposition_msg
-│   ├── Setrealtimepush_msg
-│   ├── Sixforce_msg
-│   └── Stop_msg
+│   ├── Armcurrentstatus.msg
+│   ├── Armoriginalstate.msg
+│   ├── Armsoftversion.msg
+│   ├── Armstate.msg
+│   ├── Cartepos.msg
+│   ├── Carteposcustom.msg
+│   ├── Forcepositionmovejoint.msg
+│   ├── Forcepositionmovepose.msg
+│   ├── Force_Position_State.msg
+│   ├── Getallframe.msg
+│   ├── GetArmState_Command.msg
+│   ├── Gripperpick.msg
+│   ├── Gripperset.msg
+│   ├── Handangle.msg
+│   ├── Handforce.msg
+│   ├── Handposture.msg
+│   ├── Handseq.msg
+│   ├── Handspeed.msg
+│   ├── Handstatus.msg
+│   ├── Jointcurrent.msg
+│   ├── Jointenflag.msg
+│   ├── Jointerrclear.msg
+│   ├── Jointerrorcode.msg
+│   ├── Jointposeeuler.msg
+│   ├── Jointpos.msg
+│   ├── Jointposcustom.msg
+│   ├── Jointspeed.msg
+│   ├── Jointteach.msg
+│   ├── Jointtemperature.msg
+│   ├── Jointvoltage.msg
+│   ├── Liftheight.msg
+│   ├── Liftspeed.msg
+│   ├── Liftstate.msg
+│   ├── Movec.msg
+│   ├── Movej.msg
+│   ├── Movejp.msg
+│   ├── Movel.msg
+│   ├── Ortteach.msg
+│   ├── Posteach.msg
+│   ├── Setforceposition.msg
+│   ├── Setrealtimepush.msg
+│   ├── Sixforce.msg
+│   └── Stop.msg
 ├── package.xml                                      # dependency declaration file
 └── src
 ```
@@ -350,11 +369,12 @@ __kernal2__
 The version number of sub-core 2 of the real-time kernel, string type.  
 __productversion__  
 Robotic arm model, string type.  
-### Gripper's_pick-Gripperpick_msg
+### Gripper_pick-Gripperpick_msg
 ```
 uint16 speed  
 uint16 force  
-bool block  
+bool block 
+uint16 timeout 
 ```
 __msg member__  
 __speed__  
@@ -363,11 +383,14 @@ __force__
 Gripper pick torque threshold, unsigned int type, range: 50-1000.  
 __block__  
 whether it is a blocking mode, bool type, true-blocking, false-non-blocking.  
-### Gripper's_pick_gripper's_pick-on-Gripperpick_msg
+__timeout__ 
+Set the timeout for the return, and the blocking mode will take effect (in seconds).
+### Gripper_pick_gripper_pick-on-Gripperpick_msg
 ```
 uint16 speed  
 uint16 force  
 bool block  
+uint16 timeout 
 ```
 __msg member__  
 __speed__  
@@ -376,16 +399,21 @@ __force__
 Gripper picks torque threshold, unsigned int type, range: 50-1000.  
 __block__  
 whether it is a blocking mode, bool type, true-blocking, false-non-blocking.  
+__timeout__ 
+Set the timeout for the return, and the blocking mode will take effect (in seconds).
 ### Gripper_reaching_the_given_position-Gripperset_msg
 ```
 uint16 position  
 bool block 
+uint16 timeout 
 ``` 
 __msg member__  
 __position__  
 Gripper target position, unsigned int type, range: 1-1000, representing the degree of opening of the gripper: 0-70 mm.  
 __block__  
 whether it is a blocking mode, bool type, true-blocking, false-non-blocking.  
+__timeout__ 
+Set the timeout for the return, and the blocking mode will take effect (in seconds).
 ### Force-position_mixing_control-Setforceposition_msg
 ```
 uint8 sensor  
@@ -574,5 +602,113 @@ __force_coordinate__
 Coordinate system for external force data of the system, where 0 is the sensor coordinate system, 1 is the current work coordinate system, and 2 is the current tool coordinate system.  
 __ip__  
 Customized reporting target IP address.  
+
+### UDP_manipulator_status_report-Armcurrentstatus_msg
+```
+uint16 arm_current_status
+```
+__msg member__   
+__arm_current_status__  
+Mechanical arm status,
+0-RM_IDLE_E // Enabled but idle state
+1-RM_MOVE_L_E // move L state in motion
+2-RM_MOVE_J_E // move J in motion
+3-RM_MOVE_C_E // move C state in motion
+4-RM_MOVE_S_E // move S state in motion
+5-RM_MOVE_THROUGH_JOINT_E // Angle transparent state
+6-RM_MOVE_THROUGH_POSE_E // Pose transparent state
+7-RM _ move _ through _ force _ pose _ e//Force control transparent transmission state
+8-RM_MOVE_THROUGH_CURRENT_E // Current loop transparent state
+9-RM_STOP_E // Emergency stop status
+10-RM_SLOW_STOP_E // slow stop status
+11-RM_PAUSE_E // Pause status
+12-RM_CURRENT_DRAG_E // Current loop drag status
+13-RM_SENSOR_DRAG_E // Six-axis force drag state
+14-RM_TECH_DEMONSTRATION_E // Teaching Status
+### UDP_joint_current_report-Jointcurrent_msg
+```
+float32[] joint_current
+```
+__msg member__    
+__joint_current__   
+Current joint current with an accuracy of 0.001mA.
+### UDP_joint_enabling_status_report-Jointenflag_msg
+```
+bool[] joint_en_flag
+```
+__msg member__   
+__joint_en_flag__   
+Current joint enabling state, 1 is up enabling and 0 is down enabling.
+### UDP_manipulator_Euler_angle_posture_report-Jointposeeuler_msg
+```
+float32[3] euler
+float32[3] position
+```
+__msg member__    
+__euler__   
+Euler angle of current waypoint attitude, with an accuracy of 0.001rad.   
+__position__   
+The current waypoint position has an accuracy of 0.000001M.
+### UDP joint_speed_report-Jointspeed_msg
+```
+float32[] joint_speed
+```
+__msg member__    
+__joint_speed__    
+Current joint speed, accuracy 0.02RPM.
+### UDP_joint_temperature_report-Jointtemperature_msg
+```
+float32[] joint_temperature
+```
+__msg member__   
+__joint_temperature__   
+Current joint temperature, with an accuracy of 0.001℃.
+### UDP_joint_voltage_report-Jointvoltage_msg
+```
+float32[] joint_voltage
+```
+__msg member__     
+__joint_voltage__   
+Current joint voltage, with an accuracy of 0.001V V.
+
+### Customize_high_following_mode_joint_transmission-Jointpos_msg
+```
+float32[] joint  
+bool follow  
+float32 expand  
+uint8 dof
+uint8 trajectory_mode
+uint8 radio
+```
+__msg member__     
+__joint__  
+Joint angle, float type, unit: radians.  
+__follow__    
+Follow state, bool type, true: high follow, false: low follow, default high follow if not set.  
+__expand__  
+Expand joint, float type, unit: radians.  
+__dof__  
+Degree of freedom message of the robotic arm.   
+__trajectory_mode__  
+When the high following mode is set, multiple modes are supported, including 0- complete transparent transmission mode, 1- curve fitting mode and 2- filtering mode.  
+__radio__  
+Set the smoothing coefficient in curve fitting mode (range 0-100) or the filter parameter in filtering mode (range 0-1000). The higher the value, the better the smoothing effect.  
+
+### Customize_high_following_mode_pose_transmission-Cartepos_msg
+```
+geometry_msgs/Pose pose  
+bool follow  
+uint8 trajectory_mode
+uint8 radio
+```
+__msg member__  
+__pose__  
+Robotic arm poses geometry_msgs/Pose type, x, y, z coordinates (float type, unit: m) + quaternion.  
+__follow__  
+Follow state, bool type, true: high follow, false: low follow, default high follow if not set. 
+__trajectory_mode__  
+When the high following mode is set, multiple modes are supported, including 0- complete transparent transmission mode, 1- curve fitting mode and 2- filtering mode.  
+__radio__  
+Set the smoothing coefficient in curve fitting mode (range 0-100) or the filter parameter in filtering mode (range 0-1000). The higher the value, the better the smoothing effect.  
 
 It is mainly for the application of API to achieve some of the robotic arm functions; for a more complete introduction and use, please see the special document "[RealMan Robotic Arm ROS2 Topic Detailed Description](https://github.com/kaola-zero/ros2_rm_robot/blob/main/rm_driver/doc/RealMan%20Robotic%20Arm%20rm_driver%20Topic%20Detailed%20Description%20(ROS2).md)".

@@ -6,7 +6,7 @@
 
 <div align="center">
 
-# 睿尔曼机器人rm_driver使用说明书V1.2.1
+# 睿尔曼机器人rm_driver使用说明书V1.3
  
 睿尔曼智能科技（北京）有限公司 
 文件修订记录：
@@ -17,6 +17,7 @@
 |V1.1    |2024-7-8  |修订(添加GEN72适配文件) |
 |V1.2    |2024-9-10 |修订(添加ECO63适配文件) |
 |V1.2.1  |2024-10-31|修订(添加灵巧手高速适配) |
+|V1.3    |2024-12-25|修订(添加UDP上报适配) |
 
 </div>
 
@@ -67,6 +68,9 @@ rm_driver:
     udp_cycle: 5                  #udp主动上报周期，需要是5的倍数  
     udp_port: 8089                #设置udp主动上报端口  
     udp_force_coordinate: 0       #设置系统受力时六维力的基准坐标，0为传感器坐标系 1为当前工作坐标系 2为当前工具坐标系
+
+    trajectory_mode: 0            #设置高跟随模式下，支持多种模式，0-完全透传模式、1-曲线拟合模式、2-滤波模式
+    radio: 0                      #设置曲线拟合模式下平滑系数（范围0-100）或者滤波模式下的滤波参数（范围0-1000），数值越大表示平滑效果越好
 ```
 
 其中主要有以下几个参数。
@@ -78,7 +82,9 @@ rm_driver:
 * udp_cycle：udp主动上报周期，需要是5的倍数。
 * udp_port：设置udp主动上报端口。
 * udp_force_coordinate：设置系统受力时六维力的基准坐标，0为传感器坐标系（原始数据） 1为当前工作坐标系 2为当前工具坐标系。
-* 再实际使用时，我们选择对应的launch文件启动时会自动选择正确的型号，若有特殊要求可在此处进行相应的参数修改，修改之后需要在工作空间目录下进行重新编译，之后修改的配置才会生效。
+* trajectory_mode：设置高跟随模式下，支持多种模式，0-完全透传模式、1-曲线拟合模式、2-滤波模式
+* radio：设置曲线拟合模式下平滑系数（范围0-100）或者滤波模式下的滤波参数（范围0-1000），数值越大表示平滑效果越好
+* 在实际使用时，我们选择对应的launch文件启动时会自动选择正确的型号，若有特殊要求可在此处进行相应的参数修改，修改之后需要在工作空间目录下进行重新编译，之后修改的配置才会生效。
 * 在工作空间目录运行colcon build指令。
 
 ```
@@ -132,8 +138,8 @@ rm@rm-desktop: ~/ros2_ws$ colcon build
 │   ├── libRM_Service.so.1 -> libRM_Service.so.1.0.0      #API库文件
 │   ├── libRM_Service.so.1.0 -> libRM_Service.so.1.0.0    #API库文件
 │   ├── libRM_Service.so.1.0.0                            #API库文件
-│   ├── linux_arm_service_release_v4.3.2.t1.tar.bz2       #API库文件
-│   └── linux_x86_service_release_v4.3.2.t1.tar.bz2       #API库文件
+│   ├── linux_arm_service_release_v4.3.7.t7.tar.bz2       #API库文件
+│   └── linux_x86_service_release_v4.3.7.t7.tar.bz2       #API库文件
 ├── package.xml                                           #依赖声明文件
 ├── README_CN.md
 ├── README.md

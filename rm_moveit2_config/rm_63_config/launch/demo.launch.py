@@ -78,7 +78,7 @@ def generate_launch_description():
 
     # Trajectory Execution Functionality
     moveit_simple_controllers_yaml = load_yaml(
-        "rm_65_moveit_config", "config/moveit_controllers.yaml"
+        "rm_63_config", "config/moveit_controllers.yaml"
     )
 
     moveit_controllers = {

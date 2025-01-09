@@ -6,7 +6,7 @@
 
 <div align="center">
 
-# 睿尔曼机器人rm_description使用说明书V1.2
+# 睿尔曼机器人rm_description使用说明书V1.3
  
 睿尔曼智能科技（北京）有限公司 
 文件修订记录：
@@ -15,7 +15,8 @@
 | :---: | :-----: | :---: |
 |V1.0    |2024-2-19  |拟制 |
 |V1.1    |2024-7-3   |修订(添加GEN72适配文件) |
-|V1.2    |2024-9-10  |修订(添加ECO63适配文件) |
+|V1.2    |2024-9-11  |修订(添加ECO63适配文件) |
+|V1.3    |2024-12-25 |修订(添加了63、65、75、ECO65的六维力适配文件，以及63、65、75、ECO63、ECO65的一体化六维力适配文件) |
 
 </div>
 
@@ -40,7 +41,15 @@ rm_description功能包为显示机器人模型和TF变换的功能包，通过�
 ```
 rm@rm-desktop:~$ ros2 launch rm_description rm_<arm_type>_display.launch.py
 ```
-在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65、eco63、75、gen72。  
+在实际使用时需要将以上的<arm_type>更换为实际的机械臂型号，可选择的机械臂型号有65、63、eco65, eco63、75、gen72。  
+启动六维力版本机械臂的命令为(注意：eco63不可用)：
+```
+rm@rm-desktop:~$ ros2 launch rm_description rm_<arm_type>_6f_display.launch.py
+```
+启动一体化六维力版本机械臂的命令为：
+```
+rm@rm-desktop:~$ ros2 launch rm_description rm_<arm_type>_6fb_display.launch.py
+```
 例如65机械臂的启动命令：  
 ```
 rm@rm-desktop:~$ ros2 launch rm_description rm_65_display.launch.py
@@ -67,20 +76,31 @@ rm@rm-desktop:~$ rviz2
 ```
 ├── CMakeLists.txt                #编译规则文件
 ├── launch
+│   ├── rm_63_6f_display.launch.py  #63六维力启动文件
+│   ├── rm_63_6fb_display.launch.py #63一体化六维力启动文件
 │   ├── rm_63_display.launch.py     #63启动文件
+│   ├── rm_65_6f_display.launch.py  #65六维力启动文件
+│   ├── rm_65_6fb_display.launch.py #65一体化六维力启动文件
 │   ├── rm_65_display.launch.py     #65启动文件
+│   ├── rm_75_6f_display.launch.py  #75六维力启动文件
+│   ├── rm_75_6fb_display.launch.py #75一体化六维力启动文件
 │   ├── rm_75_display.launch.py     #75启动文件
-│   ├── rm_eco65_display.launch.py  #eco65启动文件
+│   ├── rm_eco63_6fb_display.launch.py #eco63一体化六维力启动文件
 │   ├── rm_eco63_display.launch.py  #eco63启动文件
+│   ├── rm_eco65_6f_display.launch.py  #eco65六维力启动文件
+│   ├── rm_eco65_6fb_display.launch.py #eco65一体化六维力启动文件
+│   ├── rm_eco65_display.launch.py  #eco65启动文件
 │   └── rm_gen72_display.launch.py  #gen72启动文件
-├── meshes                          #模型文件存放文件夹
-│   ├── rm_63_arm                   #63机械臂模型文件存放文件夹
+├── meshes                       #模型文件存放文件夹
+│   ├── rm_63_arm                 #63机械臂模型文件存放文件夹
 │   │   ├── base_link.STL
 │   │   ├── link1.STL
 │   │   ├── link2.STL
 │   │   ├── link3.STL
 │   │   ├── link4.STL
 │   │   ├── link5.STL
+│   │   ├── link6_6f.STL
+│   │   ├── link6_6fb.STL
 │   │   └── link6.STL
 │   ├── rm_65_arm                 #65机械臂模型文件存放文件夹
 │   │   ├── base_link.STL
@@ -89,6 +109,8 @@ rm@rm-desktop:~$ rviz2
 │   │   ├── link3.STL
 │   │   ├── link4.STL
 │   │   ├── link5.STL
+│   │   ├── link6_6f.STL
+│   │   ├── link6_6fb.STL
 │   │   └── link6.STL
 │   ├── rm_75_arm                 #75机械臂模型文件存放文件夹
 │   │   ├── base_link.STL
@@ -98,6 +120,8 @@ rm@rm-desktop:~$ rviz2
 │   │   ├── link4.STL
 │   │   ├── link5.STL
 │   │   ├── link6.STL
+│   │   ├── link7_6f.STL
+│   │   ├── link7_6fb.STL
 │   │   └── link7.STL
 │   └── rm_eco65_arm              #eco65机械臂模型文件存放文件夹
 │   │   ├── baselink.STL
@@ -106,6 +130,8 @@ rm@rm-desktop:~$ rviz2
 │   │   ├── Link3.STL
 │   │   ├── Link4.STL
 │   │   ├── Link5.STL
+│   │   ├── Link6_6f.STL
+│   │   ├── Link6_6fb.STL
 │   │   └── Link6.STL
 │   └── rm_eco63_arm              #eco63机械臂模型文件存放文件夹
 │   │   ├── base_link.STL
@@ -114,6 +140,7 @@ rm@rm-desktop:~$ rviz2
 │   │   ├── Link3.STL
 │   │   ├── Link4.STL
 │   │   ├── Link5.STL
+│   │   ├── Link6_6fb.STL
 │   │   └── Link6.STL
 │   └── rm_gen72_arm              #gen72机械臂模型文件存放文件夹
 │       ├── base_link.STL
@@ -135,24 +162,43 @@ rm@rm-desktop:~$ rviz2
 ├── textures
 └── urdf
     ├── display_arm.rviz
+    ├── rm_65_6f.urdf                   #65 六维力urdf描述文件
+    ├── rm_65_6fb.urdf                  #65 一体化六维力urdf描述文件   
     ├── rm_65_description.csv
-    ├── rm_65_gazebo.urdf               #65gazebo仿真urdf描述文件
+    ├── rm_65_gazebo.urdf               #65 gazebo仿真urdf描述文件
+    ├── rm_65_gazebo.urdf.xacro         #65 gazebo仿真xacro描述文件
     ├── rm_65.urdf                      #65 urdf描述文件
+    ├── rm_65.urdf.xacro                #65 xacro描述文件
+    ├── rm_75_6f.urdf                   #75 六维力urdf描述文件
+    ├── rm_75_6fb.urdf                  #75 一体化六维力urdf描述文件   
     ├── rm_75_description.csv
-    ├── rm_75_gazebo.urdf               #75gazebo仿真urdf描述文件
+    ├── rm_75_gazebo.urdf               #75 gazebo仿真urdf描述文件
+    ├── rm_75_gazebo.urdf.xacro         #75 gazebo仿真xacro描述文件
     ├── rm_75.urdf                      #75 urdf描述文件
+    ├── rm_75.urdf.xacro                #75 xacro描述文件
+    ├── rm_eco65_6f.urdf                #eco65 六维力urdf描述文件
+    ├── rm_eco65_6fb.urdf               #eco65 一体化六维力urdf描述文件   
     ├── rm_eco65.csv
-    ├── rm_eco65_gazebo.urdf            #eco65gazebo仿真urdf描述文件
+    ├── rm_eco65_gazebo.urdf            #eco65 gazebo仿真urdf描述文件
+    ├── rm_eco65_gazebo.urdf.xacro      #eco65 gazebo仿真xacro描述文件
     ├── rm_eco65.urdf                   #eco65 urdf描述文件
+    ├── rm_eco65.urdf.xacro             #eco65 xacro描述文件
+    ├── rm_eco63_6fb.urdf               #eco63 一体化六维力urdf描述文件
+    ├── rm_eco63_gazebo.urdf            #eco63 gazebo仿真urdf描述文件
+    ├── rm_eco63_gazebo.urdf.xacro      #eco63 gazebo仿真xacro描述文件
     ├── rm_eco63.csv
-    ├── rm_eco63_gazebo.urdf            #eco63gazebo仿真urdf描述文件
     ├── rm_eco63.urdf                   #eco63 urdf描述文件
+    ├── rm_eco63.urdf.xacro             #eco63 xacro描述文件
     ├── rm_gen72.csv
     ├── rm_gen72_gazebo.urdf            #gen72gazebo仿真urdf描述文件
     ├── rm_gen72.urdf                   #gen72 urdf描述文件
+    ├── rml_63_6f.urdf                  #63 六维力urdf描述文件
+    ├── rml_63_6fb.urdf                 #63 一体化六维力urdf描述文件  
     ├── rml_63_description.csv
-    ├── rml_63_gazebo.urdf               #63gazebo仿真urdf描述文件
-    └── rml_63.urdf                      #63 urdf描述文件
+    ├── rml_63_gazebo.urdf              #63 gazebo仿真urdf描述文件
+    ├── rml_63_gazebo.urdf.xacro        #63 gazebo仿真xacro描述文件
+    ├── rml_63.urdf                     #63 urdf描述文件
+    └── rml_63.urdf.xacro               #63 xacro描述文件
 ```
 ## rm_description话题说明
 如下为该功能包的话题说明。  
