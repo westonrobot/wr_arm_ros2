@@ -39,8 +39,8 @@ void GetArmState::GetArmState_Callback(const rm_ros_interfaces::msg::Armoriginal
       RCLCPP_INFO (this->get_logger(),"joint state is: [%lf, %lf, %lf, %lf, %lf, %lf]\n", msg.joint[0],msg.joint[1],msg.joint[2],msg.joint[3],msg.joint[4],msg.joint[5]);
     }
     RCLCPP_INFO (this->get_logger(),"pose state is: [%lf, %lf, %lf, %lf, %lf, %lf]\n", msg.pose[0],msg.pose[1],msg.pose[2],msg.pose[3],msg.pose[4],msg.pose[5]);
-    RCLCPP_INFO (this->get_logger(),"arm_err is: %d\n",msg.arm_err);
-    RCLCPP_INFO (this->get_logger(),"sys_err is: %d\n",msg.sys_err);
+    // RCLCPP_INFO (this->get_logger(),"arm_err is: %d\n",msg.arm_err);
+    // RCLCPP_INFO (this->get_logger(),"sys_err is: %d\n",msg.sys_err);
 }   
 /***********************************************end**************************************************/
 

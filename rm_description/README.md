@@ -6,7 +6,7 @@
 
 <div align="center">
 
-# RealMan Robot rm_description User Manual V1.2
+# RealMan Robot rm_description User Manual V1.3
 
 RealMan Intelligent Technology (Beijing) Co., Ltd. 
 
@@ -17,7 +17,7 @@ Revision History:
 |V1.0	  | 2/19/2024 | Draft |
 |V1.1	  | 7/8 /2024 | Amend(Add GEN72 adapter files) |
 |V1.2	  | 9/11 /2024| Amend(Add ECO63 adapter files) |
-
+|V1.3 	| 25/12/2024| Amend(Add 63, 65, 75, ECO65 six-axis force adapter files and 63, 65, 75, ECO63, ECO65 integrated six-axis force adapter files) |
 </div>
 
 ## Content
@@ -42,7 +42,16 @@ First, after configuring the environment and completing the connection, we can d
 ```
 rm@rm-desktop:~$ ros2 launch rm_description rm_<arm_type>_display.launch.py
 ```
-In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65, 75, and gen72.  
+In practice, the above <arm_type> needs to be replaced by the actual model of the robotic arm. The available models of the robotic arm are 65, 63, eco65, eco63, 75, and gen72.  
+
+The command to start the six-axis force version of the manipulator is (note: eco63 is not available):
+```
+rm@rm-desktop:~$ ros2 launch rm_description rm_<arm_type>_6f_display.launch.py
+```
+The command to start the integrated six-axis force version of the manipulator is :
+```
+rm@rm-desktop:~$ ros2 launch rm_description rm_<arm_type>_6fb_display.launch.py
+```
 For example, the launch command of 65 robotic arm:  
 ```
 rm@rm-desktop:~$ ros2 launch rm_description rm_65_display.launch.py
@@ -69,10 +78,19 @@ The current rm_driver package is composed of the following files.
 ```
 ├── CMakeLists.txt                # compilation rule file
 ├── launch
+│   ├── rm_63_6f_display.launch.py  # 63 six-axis force launch file
+│   ├── rm_63_6fb_display.launch.py # 63 integrated six-axis force launch file
 │   ├── rm_63_display.launch.py     # 63 launch file
+│   ├── rm_65_6f_display.launch.py  # 65 six-axis force launch file
+│   ├── rm_65_6fb_display.launch.py # 65 integrated six-axis force launch file
 │   ├── rm_65_display.launch.py     # 65 launch file
+│   ├── rm_75_6f_display.launch.py  # 75 six-axis force launch file
+│   ├── rm_75_6fb_display.launch.py # 75 integrated six-axis force launch file
 │   ├── rm_75_display.launch.py     # 75 launch file
+│   ├── rm_eco65_6f_display.launch.py  # eco65 six-axis force launch file
+│   ├── rm_eco65_6fb_display.launch.py # eco65 integrated six-axis force launch file
 │   ├── rm_eco65_display.launch.py  # eco65 launch file
+│   ├── rm_eco63_6fb_display.launch.py # eco63 integrated six-axis force launch file
 │   ├── rm_eco63_display.launch.py  # eco63 launch file
 │   └── rm_gen72_display.launch.py  # gen72 launch file
 ├── meshes                       # model file storage folder
@@ -83,6 +101,8 @@ The current rm_driver package is composed of the following files.
 │   │   ├── link3.STL
 │   │   ├── link4.STL
 │   │   ├── link5.STL
+│   │   ├── link6_6f.STL
+│   │   ├── link6_6fb.STL
 │   │   └── link6.STL
 │   ├── rm_65_arm                 #65 robotic arm model file storage folder
 │   │   ├── base_link.STL
@@ -91,6 +111,8 @@ The current rm_driver package is composed of the following files.
 │   │   ├── link3.STL
 │   │   ├── link4.STL
 │   │   ├── link5.STL
+│   │   ├── link6_6f.STL
+│   │   ├── link6_6fb.STL
 │   │   └── link6.STL
 │   ├── rm_75_arm                 #75 robotic arm model file storage folder
 │   │   ├── base_link.STL
@@ -100,6 +122,8 @@ The current rm_driver package is composed of the following files.
 │   │   ├── link4.STL
 │   │   ├── link5.STL
 │   │   ├── link6.STL
+│   │   ├── link7_6f.STL
+│   │   ├── link7_6fb.STL
 │   │   └── link7.STL
 │   └── rm_eco65_arm                 #eco65 robotic arm model file storage folder
 │   │   ├── baselink.STL
@@ -108,6 +132,8 @@ The current rm_driver package is composed of the following files.
 │   │   ├── Link3.STL
 │   │   ├── Link4.STL
 │   │   ├── Link5.STL
+│   │   ├── Link6_6f.STL
+│   │   ├── Link6_6fb.STL
 │   │   └── Link6.STL
 │   └── rm_eco63_arm                 #eco63 robotic arm model file storage folder
 │   │   ├── baselink.STL
@@ -116,6 +142,7 @@ The current rm_driver package is composed of the following files.
 │   │   ├── Link3.STL
 │   │   ├── Link4.STL
 │   │   ├── Link5.STL
+│   │   ├── Link6_6fb.STL
 │   │   └── Link6.STL
 │   └── rm_gen72_arm                 #gen72 robotic arm model file storage folder
 │       ├── base_link.STL
@@ -139,24 +166,43 @@ The current rm_driver package is composed of the following files.
 ├── textures
 └── urdf
     ├── display_arm.rviz
+    ├── rm_65_6f.urdf                   #65 six-axis force urdf description file
+    ├── rm_65_6fb.urdf                  #65 integrated six-axis force urdf description file
     ├── rm_65_description.csv
-    ├── rm_65_gazebo.urdf               #65gazebo simulation urdf description file
+    ├── rm_65_gazebo.urdf               #65 gazebo simulation urdf description file
+    ├── rm_65_gazebo.urdf.xacro         #65 gazebo simulation xacro description file
     ├── rm_65.urdf                      #65 urdf description file
+    ├── rm_65.urdf.xacro                #65 xacro description file
+    ├── rm_75_6f.urdf                   #75 six-axis force urdf description file
+    ├── rm_75_6fb.urdf                  #75 integrated six-axis force urdf description file
     ├── rm_75_description.csv
-    ├── rm_75_gazebo.urdf               #75gazebo simulation urdf description file
+    ├── rm_75_gazebo.urdf               #75 gazebo simulation urdf description file
+    ├── rm_75_gazebo.urdf.xacro         #75 gazebo simulation xacro description file
     ├── rm_75.urdf                      #75 urdf description file
+    ├── rm_75.urdf.xacro                #75 xacro description file
+    ├── rm_eco65_6f.urdf                #eco65 six-axis force urdf description file
+    ├── rm_eco65_6fb.urdf               #eco65 integrated six-axis force urdf description file 
     ├── rm_eco65.csv
-    ├── rm_eco65_gazebo.urdf            #eco65gazebo simulation urdf description file
+    ├── rm_eco65_gazebo.urdf            #eco65 gazebo simulation urdf description file
+    ├── rm_eco65_gazebo.urdf.xacro      #eco65 gazebo simulation xacro description file
     ├── rm_eco65.urdf                   #eco65 urdf description file
+    ├── rm_eco65.urdf.xacro             #eco65 xacro description file
+    ├── rm_eco63_6fb.urdf               #eco63 integrated six-axis force urdf description file
     ├── rm_eco63.csv
-    ├── rm_eco63_gazebo.urdf            #eco63gazebo simulation urdf description file
+    ├── rm_eco63_gazebo.urdf            #eco63 gazebo simulation urdf description file
+    ├── rm_eco63_gazebo.urdf.xacro      #eco63 gazebo simulation xacro description file
     ├── rm_eco63.urdf                   #eco63 urdf description file
+    ├── rm_eco63.urdf.xacro             #eco63 xacro description file
     ├── rm_gen72.csv
-    ├── rm_gen72_gazebo.urdf            #gen72gazebo simulation urdf description file
+    ├── rm_gen72_gazebo.urdf            #gen72 gazebo simulation urdf description file
     ├── rm_gen72.urdf                   #gen72 urdf description file
+    ├── rml_63_6f.urdf                  #63 six-axis force urdf description file
+    ├── rml_63_6fb.urdf                 #63 integrated six-axis force urdf description file
     ├── rml_63_description.csv
-    ├── rml_63_gazebo.urdf               #63gazebo simulation urdf description file
-    └── rml_63.urdf                      #63 urdf description file
+    ├── rml_63_gazebo.urdf              #63 gazebo simulation urdf description file
+    ├── rml_63_gazebo.urdf.xacro        #63 gazebo simulation xacro description file
+    ├── rml_63.urdf                     #63 urdf description file
+    └── rml_63.urdf.xacro               #63 xacro description file
 ```
 ## rm_description_Topic_Description
 The following is the topic description of the package.  

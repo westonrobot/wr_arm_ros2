@@ -92,6 +92,7 @@ rm@rm-desktop: ~/ros2_ws$ colcon build
 ```
   Subscribers:
     /parameter_events: rcl_interfaces/msg/ParameterEvent
+    /rm_driver/move_stop_cmd: std_msgs::msg::Bool
   Publishers:
     /parameter_events: rcl_interfaces/msg/ParameterEvent
     /rm_driver/movej_canfd_cmd: rm_ros_interfaces/msg/Jointpos

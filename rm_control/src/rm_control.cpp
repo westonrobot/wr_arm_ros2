@@ -286,6 +286,9 @@ Rm_Control::Rm_Control(std::string name) : Node(name)
 
     joint_pos_publisher = this->create_publisher<rm_ros_interfaces::msg::Jointpos>("/rm_driver/movej_canfd_cmd", qos);
 
+    Get_Move_Stop_Cmd = this->create_subscription<std_msgs::msg::Bool>("rm_driver/move_stop_cmd",rclcpp::ParametersQoS(),
+        std::bind(&Rm_Control::get_move_stop_callback,this,std::placeholders::_1));
+
 }
 
 rclcpp_action::GoalResponse Rm_Control::handle_goal(const rclcpp_action::GoalUUID &uuid, std::shared_ptr<const FollowJointTrajectory::Goal> goal)
@@ -722,6 +725,13 @@ void Rm_Control::timer_callback()
     }
 }
 
+void Rm_Control::get_move_stop_callback(const std_msgs::msg::Bool::SharedPtr msg)
+{
+    bool result;
+    result = msg->data;
+    point_changed=false;
+    //RCLCPP_INFO(this->get_logger(), "move stop is true!!! ");
+}
 /* 主函数主要用于动作订阅和套接字通信 */
 int main(int argc, char** argv)
 {

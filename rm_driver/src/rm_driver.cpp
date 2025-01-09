@@ -108,7 +108,8 @@ int Arm_Socket_Start_Connect(void)
 int Arm_Start(void)
 {
     m_sockhand =  Rm_Api.Service_Arm_Socket_Start((char*)tcp_ip, tcp_port, 5000);
-    
+    // m_sockhand =  Rm_Api.Service_Arm_Socket_Start((char*)"192.168.1.234", 8080, 5000);
+    //std::cout<<m_sockhand<<std::endl;
     return 0;
 }
 
@@ -257,6 +258,8 @@ void RmArm::Arm_Movej_CANFD_Callback(rm_ros_interfaces::msg::Jointpos::SharedPtr
     bool follow;
     float expand;
     u_int32_t res;
+    byte trajectory_mode;
+    int radio;
     std_msgs::msg::UInt32 movej_CANFD_data;
 
     for(int i = 0; i < 6; i++)
@@ -270,7 +273,46 @@ void RmArm::Arm_Movej_CANFD_Callback(rm_ros_interfaces::msg::Jointpos::SharedPtr
 
     follow = msg->follow;
     expand = msg->expand * RAD_DEGREE;
-    res = Rm_Api.Service_Movej_CANFD(m_sockhand, joint, follow, expand);
+    trajectory_mode = trajectory_mode_;
+    radio = radio_;
+    //res = Rm_Api.Service_Movej_CANFD(m_sockhand, joint, follow, expand);
+    //std::cout<<"Service_Movej_CANFD_With_Radio is run!!!!"<<std::endl;
+    res = Rm_Api.Service_Movej_CANFD_With_Radio(m_sockhand, joint, follow, expand, trajectory_mode, radio);
+    
+    movej_CANFD_data.data = res;
+    if(movej_CANFD_data.data != 0)
+    {
+        RCLCPP_INFO (this->get_logger(),"Movej CANFD error code is %d\n",movej_CANFD_data.data);
+    }
+}
+
+void RmArm::Arm_Movej_CANFD_Custom_Callback(rm_ros_interfaces::msg::Jointposcustom::SharedPtr msg)
+{
+    float joint[7];
+    bool follow;
+    float expand;
+    u_int32_t res;
+    byte trajectory_mode;
+    int radio;
+    std_msgs::msg::UInt32 movej_CANFD_data;
+
+    for(int i = 0; i < 6; i++)
+    {
+        joint[i] = msg->joint[i] * RAD_DEGREE;
+    }
+    if(msg->dof == 7)
+    {
+        joint[6] = msg->joint[6] * RAD_DEGREE;
+    }
+
+    follow = msg->follow;
+    expand = msg->expand * RAD_DEGREE;
+    trajectory_mode = msg->trajectory_mode;
+    radio = msg->radio;
+    //res = Rm_Api.Service_Movej_CANFD(m_sockhand, joint, follow, expand);
+    // std::cout<<"Service_Movej_CANFD_Custom is run!!!!"<<std::endl;
+    res = Rm_Api.Service_Movej_CANFD_With_Radio(m_sockhand, joint, follow, expand, trajectory_mode, radio);
+    
     movej_CANFD_data.data = res;
     if(movej_CANFD_data.data != 0)
     {
@@ -287,6 +329,8 @@ void RmArm::Arm_Movep_CANFD_Callback(rm_ros_interfaces::msg::Cartepos::SharedPtr
     std_msgs::msg::UInt32 movep_CANFD_data;
     Quat rec_pose;
     Euler tarns_euler;
+    byte trajectory_mode;
+    int radio;
 
     pose.position.x = msg->pose.position.x;
     pose.position.y = msg->pose.position.y;
@@ -300,7 +344,47 @@ void RmArm::Arm_Movep_CANFD_Callback(rm_ros_interfaces::msg::Cartepos::SharedPtr
     pose.euler.ry = tarns_euler.ry;
     pose.euler.rz = tarns_euler.rz;
     follow = msg->follow;
-    res = Rm_Api.Service_Movep_CANFD(m_sockhand, pose, follow);
+    trajectory_mode = trajectory_mode_;
+    radio = radio_;
+
+    // res = Rm_Api.Service_Movep_CANFD(m_sockhand, pose, follow);
+    res = Rm_Api.Service_Movep_CANFD_With_Radio(m_sockhand, pose, follow, trajectory_mode, radio);
+    movep_CANFD_data.data = res;
+    if(movep_CANFD_data.data != 0)
+    {
+        RCLCPP_INFO (this->get_logger(),"Movep CANFD error code is %d\n",movep_CANFD_data.data);
+    }
+}
+
+void RmArm::Arm_Movep_CANFD_Custom_Callback(rm_ros_interfaces::msg::Carteposcustom::SharedPtr msg)
+{
+    
+    Pose pose;
+    bool follow;
+    u_int32_t res;
+    std_msgs::msg::UInt32 movep_CANFD_data;
+    Quat rec_pose;
+    Euler tarns_euler;
+    byte trajectory_mode;
+    int radio;
+
+    pose.position.x = msg->pose.position.x;
+    pose.position.y = msg->pose.position.y;
+    pose.position.z = msg->pose.position.z;
+    rec_pose.w = msg->pose.orientation.w;
+    rec_pose.x = msg->pose.orientation.x;
+    rec_pose.y = msg->pose.orientation.y;
+    rec_pose.z = msg->pose.orientation.z;
+    tarns_euler = Rm_Api.Service_Algo_Quaternion2Euler(rec_pose);
+    pose.euler.rx = tarns_euler.rx;
+    pose.euler.ry = tarns_euler.ry;
+    pose.euler.rz = tarns_euler.rz;
+    follow = msg->follow;
+    trajectory_mode = msg->trajectory_mode;
+    radio = msg->radio;
+    std::cout<<"Service_Movep_CANFD_Trajectory is run!!!!"<<std::endl;
+    // res = Rm_Api.Service_Movep_CANFD(m_sockhand, pose, follow);
+    res = Rm_Api.Service_Movep_CANFD_With_Radio(m_sockhand, pose, follow, trajectory_mode, radio);
     movep_CANFD_data.data = res;
     if(movep_CANFD_data.data != 0)
     {
@@ -501,6 +585,11 @@ void RmArm::Arm_Get_Realtime_Push_Callback(const std_msgs::msg::Empty::SharedPtr
         Setrealtime_msg.force_coordinate = config.force_coordinate;
         Setrealtime_msg.ip = config.ip;
         Setrealtime_msg.hand_enable = config.custom.hand_state;
+        Setrealtime_msg.joint_speed_enable = config.custom.joint_speed;
+        Setrealtime_msg.lift_state_enable = config.custom.lift_state;
+        Setrealtime_msg.expand_state_enable = config.custom.expand_state;
+        Setrealtime_msg.arm_current_status_enable = config.custom.arm_current_status;
+        Setrealtime_msg.aloha_state_enable = config.custom.aloha_state;
         udp_hand_g = config.custom.hand_state;
         this->Get_Realtime_Push_Result->publish(Setrealtime_msg);
     }
@@ -519,13 +608,13 @@ void RmArm::Arm_Set_Realtime_Push_Callback(const rm_ros_interfaces::msg::Setreal
     config.enable = true;
     strcpy(config.ip,msg->ip.data());
     UDP_Custom_Config config_enable;
-    config_enable.expand_state = 0;
+    config_enable.expand_state = msg->expand_state_enable;
     config_enable.hand_state = msg->hand_enable;
     udp_hand_g = msg->hand_enable;
-    config_enable.joint_speed = 0;
-    config_enable.lift_state = 0;
-    config_enable.arm_current_status = 0;
-    config_enable.aloha_state = 0;
+    config_enable.joint_speed = msg->joint_speed_enable;
+    config_enable.lift_state = msg->lift_state_enable;
+    config_enable.arm_current_status = msg->arm_current_status_enable;
+    config_enable.aloha_state = msg->aloha_state_enable;
     config.custom = config_enable;
     res = Rm_Api.Service_Set_Realtime_Push(m_sockhand, config);
     if(res == 0)
@@ -556,6 +645,8 @@ void RmArm::Set_UDP_Configuration(int udp_cycle, int udp_port, int udp_force_coo
     udp_hand_g = hand;
     config_enable.joint_speed = 0;
     config_enable.lift_state = 0;
+    config_enable.aloha_state = 0;
+    config_enable.arm_current_status = 0;
     config.custom = config_enable;
     res = Rm_Api.Service_Set_Realtime_Push(m_sockhand, config);
     if(res == 0)
@@ -570,33 +661,24 @@ void RmArm::Set_UDP_Configuration(int udp_cycle, int udp_port, int udp_force_coo
 
 void RmArm::Get_Arm_Version()
 {
-    char plan_version[50];
-    char ctrl_version[50];
-    char kernal1[50];
-    char kernal2[50];
-    char product_version[50];
-    char version;
+    ArmSoftwareInfo arm_software_info;
+    char product_version[10];
     u_int32_t res;
-    res = Rm_Api.Service_Get_Arm_Software_Version(m_sockhand, plan_version, ctrl_version, kernal1, kernal2, product_version);
+    //res = Rm_Api.Service_Get_Arm_Software_Version(m_sockhand, plan_version, ctrl_version, kernal1, kernal2, product_version);
+    res = Rm_Api.Service_Get_Arm_Software_Info(m_sockhand, &arm_software_info);
     if(res == 0)
     {
-        RCLCPP_INFO (this->get_logger(),"product_version = %s",product_version);
-        version = plan_version[1];
-        if(version == 'B')
-        {
+        RCLCPP_INFO (this->get_logger(),"product_version = %s",arm_software_info.product_version);
+        strcpy(product_version, arm_software_info.product_version);
             Udp_RM_Joint.control_version = 1;
-            // RCLCPP_INFO (this->get_logger(),"control_version = %d",Udp_RM_Joint.control_version);
-        }
-        if(version == 'F')
+        for(int i=0;i<10;i++)
+        {
+            if(product_version[i]=='F')
         {
             Udp_RM_Joint.control_version = 2;
-            // RCLCPP_INFO (this->get_logger(),"control_version = %d",Udp_RM_Joint.control_version);
         }
-        if(version == 'D')
-        {
-            Udp_RM_Joint.control_version = 3;
-            // RCLCPP_INFO (this->get_logger(),"control_version = %d",Udp_RM_Joint.control_version);
         }
+            // RCLCPP_INFO (this->get_logger(),"control_version = %d",Udp_RM_Joint.control_version);
     }
     else
     {
@@ -1297,15 +1379,15 @@ void RmArm::Arm_Get_Current_Arm_State_Callback(const std_msgs::msg::Empty::Share
 {
     Pose pose;
     float joint[7];
-    u_int16_t Arm_Err;
-    u_int16_t Sys_Err;
+    u_int16_t Err;
+    u_int8_t Err_len;
     u_int32_t res;
     copy = msg;
     std_msgs::msg::Bool get_current_arm_State_result;
     Euler euler;
     Quat quat;
     int i;
-    res = Rm_Api.Service_Get_Current_Arm_State(m_sockhand, joint, &pose, &Arm_Err, &Sys_Err);
+    res = Rm_Api.Service_Get_Current_Arm_State(m_sockhand, joint, &pose, &Err, &Err_len);
     if(res == 0)
     {
         
@@ -1330,8 +1412,8 @@ void RmArm::Arm_Get_Current_Arm_State_Callback(const std_msgs::msg::Empty::Share
         Arm_original_state.pose[3] = pose.euler.rx;
         Arm_original_state.pose[4] = pose.euler.ry;
         Arm_original_state.pose[5] = pose.euler.rz;
-        Arm_original_state.arm_err = Arm_Err;
-        Arm_original_state.sys_err = Sys_Err;
+        Arm_original_state.err = Err;
+        Arm_original_state.err_len = Err_len;
         this->Get_Current_Arm_Original_State_Result->publish(Arm_original_state);
 
         euler.rx = pose.euler.rx;
@@ -1345,8 +1427,8 @@ void RmArm::Arm_Get_Current_Arm_State_Callback(const std_msgs::msg::Empty::Share
         Arm_state.pose.position.x = pose.position.x;
         Arm_state.pose.position.y = pose.position.y;
         Arm_state.pose.position.z = pose.position.z;
-        Arm_state.arm_err = Arm_Err;
-        Arm_state.sys_err = Sys_Err;
+        Arm_state.err = Err;
+        Arm_state.err_len = Err_len;
         this->Get_Current_Arm_State_Result->publish(Arm_state);
     }
     else
@@ -1432,11 +1514,21 @@ void Udp_RobotStatuscallback(RobotStatus Udp_RM_Callback)
     {
         Udp_RM_Joint.joint[i] = Udp_RM_Callback.joint_status.joint_position[i];
         Udp_RM_Joint.err_flag[i] = Udp_RM_Callback.joint_status.joint_err_code[i];
+        Udp_RM_Joint.joint_current[i] = Udp_RM_Callback.joint_status.joint_current[i];
+        Udp_RM_Joint.en_flag[i] = Udp_RM_Callback.joint_status.joint_en_flag[i];
+        Udp_RM_Joint.joint_speed[i] = Udp_RM_Callback.joint_status.joint_speed[i];
+        Udp_RM_Joint.joint_temperature[i] = Udp_RM_Callback.joint_status.joint_temperature[i];
+        Udp_RM_Joint.joint_voltage[i] = Udp_RM_Callback.joint_status.joint_voltage[i];
     }
     if(arm_dof_g == 7)
     {
         Udp_RM_Joint.joint[6] = Udp_RM_Callback.joint_status.joint_position[6];
         Udp_RM_Joint.err_flag[6] = Udp_RM_Callback.joint_status.joint_err_code[6];
+        Udp_RM_Joint.joint_current[6] = Udp_RM_Callback.joint_status.joint_current[6];
+        Udp_RM_Joint.en_flag[6] = Udp_RM_Callback.joint_status.joint_en_flag[6];
+        Udp_RM_Joint.joint_speed[6] = Udp_RM_Callback.joint_status.joint_speed[6];
+        Udp_RM_Joint.joint_temperature[6] = Udp_RM_Callback.joint_status.joint_temperature[6];
+        Udp_RM_Joint.joint_voltage[6] = Udp_RM_Callback.joint_status.joint_voltage[6];
     }
 
     if(Udp_RM_Joint.control_version == 2)
@@ -1457,7 +1549,7 @@ void Udp_RobotStatuscallback(RobotStatus Udp_RM_Callback)
             Udp_RM_Joint.hand_state[i] = Udp_RM_Callback.handState.hand_state[i];
             
         }
-        Udp_RM_Joint.hand_err = Udp_RM_Callback.arm_err;
+        // Udp_RM_Joint.hand_err = Udp_RM_Callback.arm_err;
     }
     
     Udp_RM_Joint.joint_position[0] = Udp_RM_Callback.waypoint.position.x;
@@ -1469,13 +1561,20 @@ void Udp_RobotStatuscallback(RobotStatus Udp_RM_Callback)
     Udp_RM_Joint.joint_quat[2] = Udp_RM_Callback.waypoint.quaternion.y;
     Udp_RM_Joint.joint_quat[3] = Udp_RM_Callback.waypoint.quaternion.z;
 
+    Udp_RM_Joint.joint_euler[0] = Udp_RM_Callback.waypoint.euler.rx;
+    Udp_RM_Joint.joint_euler[1] = Udp_RM_Callback.waypoint.euler.ry;
+    Udp_RM_Joint.joint_euler[2] = Udp_RM_Callback.waypoint.euler.rz;
+
+    Udp_RM_Joint.arm_current_status = Udp_RM_Callback.arm_current_status;
+    //std::cout<<"callback arm_current_status is "<<Udp_RM_Joint.arm_current_status<<std::endl;
+
     if(Udp_RM_Joint.control_version == 3)
     {
         Udp_RM_Joint.one_force = Udp_RM_Callback.force_sensor.force[0];
         Udp_RM_Joint.one_zero_force = Udp_RM_Callback.force_sensor.zero_force[0];
     }
-    Udp_RM_Joint.sys_err = Udp_RM_Callback.sys_err;
-    Udp_RM_Joint.arm_err = Udp_RM_Callback.arm_err;
+    // Udp_RM_Joint.sys_err = Udp_RM_Callback.sys_err;
+    // Udp_RM_Joint.arm_err = Udp_RM_Callback.arm_err;
     Udp_RM_Joint.coordinate = Udp_RM_Callback.force_sensor.coordinate;
     // if(udp_hand_g == true)
     // {
@@ -1494,17 +1593,34 @@ void UdpPublisherNode::udp_timer_callback()
         {
             udp_real_joint_.position[i] = Udp_RM_Joint.joint[i] * DEGREE_RAD;
             udp_joint_error_code_.joint_error[i] = Udp_RM_Joint.err_flag[i];
+            udp_joint_current_.joint_current[i] = Udp_RM_Joint.joint_current[i];
+            udp_joint_en_flag_.joint_en_flag[i] = Udp_RM_Joint.en_flag[i];
+            udp_joint_speed_.joint_speed[i] = Udp_RM_Joint.joint_speed[i];
+            udp_joint_temperature_.joint_temperature[i] = Udp_RM_Joint.joint_temperature[i];
+            udp_joint_voltage_.joint_voltage[i] = Udp_RM_Joint.joint_voltage[i];
         }
         if(arm_dof_g == 7)
         {
             udp_real_joint_.position[6] = Udp_RM_Joint.joint[6] * DEGREE_RAD;
             udp_joint_error_code_.joint_error[6] = Udp_RM_Joint.err_flag[6];
+            udp_joint_current_.joint_current[6] = Udp_RM_Joint.joint_current[6];
+            udp_joint_en_flag_.joint_en_flag[6] = Udp_RM_Joint.en_flag[6];
+            udp_joint_speed_.joint_speed[6] = Udp_RM_Joint.joint_speed[6];
+            udp_joint_temperature_.joint_temperature[6] = Udp_RM_Joint.joint_temperature[6];
+            udp_joint_voltage_.joint_voltage[6] = Udp_RM_Joint.joint_voltage[6];
             udp_joint_error_code_.dof = 7;
         }
         udp_real_joint_.header.stamp = this->now();
         this->Joint_Position_Result->publish(udp_real_joint_);
         this->Joint_Error_Code_Result->publish(udp_joint_error_code_);
-        
+        udp_arm_current_status_.arm_current_status = Udp_RM_Joint.arm_current_status;
+        //RCLCPP_INFO (this->get_logger(),"udp publisher arm_current_status is %d\n",udp_arm_current_status_.arm_current_status);
+        this->Arm_Current_Status_Result->publish(udp_arm_current_status_);
+        this->Joint_Current_Result->publish(udp_joint_current_);
+        this->Joint_En_Flag_Result->publish(udp_joint_en_flag_);
+        this->Joint_Speed_Result->publish(udp_joint_speed_);
+        this->Joint_Temperature_Result->publish(udp_joint_temperature_);
+        this->Joint_Voltage_Result->publish(udp_joint_voltage_);
         udp_arm_pose_.position.x = Udp_RM_Joint.joint_position[0];
         udp_arm_pose_.position.y = Udp_RM_Joint.joint_position[1];
         udp_arm_pose_.position.z = Udp_RM_Joint.joint_position[2];
@@ -1513,10 +1629,17 @@ void UdpPublisherNode::udp_timer_callback()
         udp_arm_pose_.orientation.y = Udp_RM_Joint.joint_quat[2];
         udp_arm_pose_.orientation.z = Udp_RM_Joint.joint_quat[3];
         this->Arm_Position_Result->publish(udp_arm_pose_);
-        sys_err_.data = Udp_RM_Joint.sys_err;
-        this->Sys_Err_Result->publish(sys_err_);
-        arm_err_.data = Udp_RM_Joint.arm_err;
-        this->Arm_Err_Result->publish(arm_err_);
+        udp_joint_pose_euler_.euler[0] = Udp_RM_Joint.joint_euler[0];
+        udp_joint_pose_euler_.euler[1] = Udp_RM_Joint.joint_euler[1];
+        udp_joint_pose_euler_.euler[2] = Udp_RM_Joint.joint_euler[2];
+        udp_joint_pose_euler_.position[0]=Udp_RM_Joint.joint_position[0];
+        udp_joint_pose_euler_.position[1]=Udp_RM_Joint.joint_position[1];
+        udp_joint_pose_euler_.position[2]=Udp_RM_Joint.joint_position[2];
+        this->Joint_Pose_Euler_Result->publish(udp_joint_pose_euler_);
+        // sys_err_.data = Udp_RM_Joint.sys_err;
+        // this->Sys_Err_Result->publish(sys_err_);
+        // arm_err_.data = Udp_RM_Joint.arm_err;
+        // this->Arm_Err_Result->publish(arm_err_);
         arm_coordinate_.data = Udp_RM_Joint.coordinate;
         this->Arm_Coordinate_Result->publish(arm_coordinate_);
 
@@ -1644,12 +1767,18 @@ UdpPublisherNode::UdpPublisherNode():
         One_Force_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/udp_one_force", 10);                       //发布当前的原始一维力数据
         One_Zero_Force_Result = this->create_publisher<rm_ros_interfaces::msg::Sixforce>("rm_driver/udp_one_zero_force", 10);             //发布当前目标坐标系下一维力数据
         Joint_Error_Code_Result = this->create_publisher<rm_ros_interfaces::msg::Jointerrorcode>("rm_driver/udp_joint_error_code", 10);   //发布当前的关节错误码
-        Sys_Err_Result = this->create_publisher<std_msgs::msg::UInt16>("rm_driver/udp_sys_err", 10);                                      //发布当前的系统错误码
-        Arm_Err_Result = this->create_publisher<std_msgs::msg::UInt16>("rm_driver/udp_arm_err", 10);                                      //发布当前的机械臂错误码
+        // Sys_Err_Result = this->create_publisher<std_msgs::msg::UInt16>("rm_driver/udp_sys_err", 10);                                      //发布当前的系统错误码
+        // Arm_Err_Result = this->create_publisher<std_msgs::msg::UInt16>("rm_driver/udp_arm_err", 10);                                      //发布当前的机械臂错误码
         Arm_Coordinate_Result = this->create_publisher<std_msgs::msg::UInt16>("rm_driver/udp_arm_coordinate", 10);                        //发布当前六维力数据的基准坐标系
         Hand_Status_Result = this->create_publisher<rm_ros_interfaces::msg::Handstatus>("rm_driver/udp_hand_status", 10);                 //发布灵巧手状态数据
-    
-    
+
+        Arm_Current_Status_Result = this->create_publisher<rm_ros_interfaces::msg::Armcurrentstatus>("rm_driver/udp_arm_current_status", 10);
+        Joint_Current_Result = this->create_publisher<rm_ros_interfaces::msg::Jointcurrent>("rm_driver/udp_joint_current",10);
+        Joint_En_Flag_Result = this->create_publisher<rm_ros_interfaces::msg::Jointenflag>("rm_driver/udp_joint_en_flag",10);
+        Joint_Pose_Euler_Result = this->create_publisher<rm_ros_interfaces::msg::Jointposeeuler>("rm_driver/udp_joint_pose_euler",10);
+        Joint_Speed_Result = this->create_publisher<rm_ros_interfaces::msg::Jointspeed>("rm_driver/udp_joint_speed",10);
+        Joint_Temperature_Result = this->create_publisher<rm_ros_interfaces::msg::Jointtemperature>("rm_driver/udp_joint_temperature",10);
+        Joint_Voltage_Result = this->create_publisher<rm_ros_interfaces::msg::Jointvoltage>("rm_driver/udp_joint_voltage",10);
     }
 
 
@@ -1687,10 +1816,18 @@ RmArm::RmArm():
 
     this->declare_parameter<bool>("udp_hand", udp_hand_);
     this->get_parameter<bool>("udp_hand", udp_hand_);
+
+    this->declare_parameter<int>("trajectory_mode", trajectory_mode_);
+    this->get_parameter<int>("trajectory_mode", trajectory_mode_);
+
+    this->declare_parameter<int>("radio", radio_);
+    this->get_parameter<int>("radio", radio_);
+
     udp_cycle_g = udp_cycle_;
     if(arm_type_ == "RM_65")
     {
         Rm_Api.Service_RM_API_Init(65, NULL);
+        //RCLCPP_INFO (this->get_logger(),"0000000000000000000000000000000000000000000000000");
         realman_arm = 65;
     }
     else if(arm_type_ == "RM_75")
@@ -1712,6 +1849,11 @@ RmArm::RmArm():
     {
         Rm_Api.Service_RM_API_Init(634, NULL);
         realman_arm = 634;
+    }
+    else if(arm_type_ == "RM_eco62")
+    {
+        Rm_Api.Service_RM_API_Init(62, NULL);
+        realman_arm = 62;
     }
     else if(arm_type_ == "GEN_72")
     {
@@ -1749,6 +1891,11 @@ RmArm::RmArm():
         udp_joint_error_code_.joint_error.resize(7);
         Arm_original_state.joint.resize(7);
         Arm_state.joint.resize(7);
+        udp_joint_current_.joint_current.resize(7);
+        udp_joint_en_flag_.joint_en_flag.resize(7);
+        udp_joint_speed_.joint_speed.resize(7);
+        udp_joint_temperature_.joint_temperature.resize(7);
+        udp_joint_voltage_.joint_voltage.resize(7);
         arm_dof_g = 7;
     }
     else
@@ -1764,12 +1911,19 @@ RmArm::RmArm():
         udp_joint_error_code_.joint_error.resize(6);
         Arm_original_state.joint.resize(6);
         Arm_state.joint.resize(6);
+        udp_joint_current_.joint_current.resize(6);
+        udp_joint_en_flag_.joint_en_flag.resize(6);
+        udp_joint_speed_.joint_speed.resize(6);
+        udp_joint_temperature_.joint_temperature.resize(6);
+        udp_joint_voltage_.joint_voltage.resize(6);
         arm_dof_g = 6;
     }
     /**************************************************end**********************************************/
     
     /**********************************************初始化、连接函数****************************************/
+    //RCLCPP_INFO (this->get_logger(),"11111111111111111111111111111111111111111111111111111111");
     Arm_Start();
+    //RCLCPP_INFO (this->get_logger(),"222222222222222222222222222222222222222222222222222222");
     /***************************************************end**********************************************/
 
     /*************************************************多线程********************************************/
@@ -1785,9 +1939,11 @@ RmArm::RmArm():
     callback_group_sub4_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     auto sub_opt4 = rclcpp::SubscriptionOptions();
     sub_opt3.callback_group = callback_group_sub4_;
-
+    
     Get_Arm_Version();//获取机械臂版本
+    //RCLCPP_INFO (this->get_logger(),"333333333333333333333333333333333333333333333333333333333333");
     Set_UDP_Configuration(udp_cycle_, udp_port_, udp_force_coordinate_, udp_ip_, udp_hand_);
+    //RCLCPP_INFO (this->get_logger(),"44444444444444444444444444444444444444444444444444444444444444444");
     /******************************************************获取udp配置********************************************************************/
     Get_Realtime_Push_Result = this->create_publisher<rm_ros_interfaces::msg::Setrealtimepush>("rm_driver/get_realtime_push_result", rclcpp::ParametersQoS());
     Get_Realtime_Push_Cmd = this->create_subscription<std_msgs::msg::Empty>("rm_driver/get_realtime_push_cmd",rclcpp::ParametersQoS(),
@@ -1820,9 +1976,15 @@ RmArm::RmArm():
     Movej_CANFD_Cmd = this->create_subscription<rm_ros_interfaces::msg::Jointpos>("rm_driver/movej_canfd_cmd",rclcpp::ParametersQoS(),
         std::bind(&RmArm::Arm_Movej_CANFD_Callback,this,std::placeholders::_1),
         sub_opt4);
+    Movej_CANFD_Custom_Cmd = this->create_subscription<rm_ros_interfaces::msg::Jointposcustom>("rm_driver/movej_canfd_custom_cmd",rclcpp::ParametersQoS(),
+        std::bind(&RmArm::Arm_Movej_CANFD_Custom_Callback,this,std::placeholders::_1),
+        sub_opt4);
     /*******************************************位姿透传****************************************/
     Movep_CANFD_Cmd = this->create_subscription<rm_ros_interfaces::msg::Cartepos>("rm_driver/movep_canfd_cmd",rclcpp::ParametersQoS(),
         std::bind(&RmArm::Arm_Movep_CANFD_Callback,this,std::placeholders::_1),
+        sub_opt4);
+    Movep_CANFD_Custom_Cmd = this->create_subscription<rm_ros_interfaces::msg::Carteposcustom>("rm_driver/movep_canfd_custom_cmd",rclcpp::ParametersQoS(),
+        std::bind(&RmArm::Arm_Movep_CANFD_Custom_Callback,this,std::placeholders::_1),
         sub_opt4);
     /****************************************MoveJ_P运动控制*************************************/
     MoveJ_P_Cmd_Result = this->create_publisher<std_msgs::msg::Bool>("rm_driver/movej_p_result", rclcpp::ParametersQoS());

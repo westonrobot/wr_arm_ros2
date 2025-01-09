@@ -65,6 +65,15 @@
 #include "rm_ros_interfaces/msg/liftstate.hpp"
 #include "rm_ros_interfaces/msg/liftheight.hpp"
 #include "rm_ros_interfaces/msg/handstatus.hpp"
+#include "rm_ros_interfaces/msg/armcurrentstatus.hpp"
+#include "rm_ros_interfaces/msg/jointcurrent.hpp"
+#include "rm_ros_interfaces/msg/jointenflag.hpp"
+#include "rm_ros_interfaces/msg/jointposeeuler.hpp"
+#include "rm_ros_interfaces/msg/jointspeed.hpp"
+#include "rm_ros_interfaces/msg/jointtemperature.hpp"
+#include "rm_ros_interfaces/msg/jointvoltage.hpp"
+#include "rm_ros_interfaces/msg/jointposcustom.hpp"
+#include "rm_ros_interfaces/msg/carteposcustom.hpp"
 #include <std_msgs/msg/u_int32.hpp>
 #include <std_msgs/msg/int32.hpp>
 #include <std_msgs/msg/empty.hpp>
@@ -126,6 +135,8 @@ typedef struct
     uint16_t hand_state[6];            //手指状态,0正在松开，1正在抓取，2位置到位停止，3力到位停止，5电流保护停止，6电缸堵转停止，7电缸故障停止
     uint16_t hand_force[6];            //灵巧手自由度电流，单位mN
     uint16_t hand_err;                 //灵巧手系统错误，1表示有错误，0表示无错误
+    uint16_t arm_current_status;    //当前机械臂状态上报，
+    float    joint_speed[7];           //当前关节速度，精度0.02RPM。
 } JOINT_STATE_VALUE;
 JOINT_STATE_VALUE Udp_RM_Joint;
 
@@ -142,7 +153,13 @@ rm_ros_interfaces::msg::Jointerrorcode udp_joint_error_code_;       //关节报�
 rm_ros_interfaces::msg::Handstatus udp_hand_status_;
 rm_ros_interfaces::msg::Armoriginalstate Arm_original_state;        //机械臂原始数据（角度+欧拉角）
 rm_ros_interfaces::msg::Armstate Arm_state;                         //机械臂数据（弧度+四元数）
-
+rm_ros_interfaces::msg::Armcurrentstatus udp_arm_current_status_;   //
+rm_ros_interfaces::msg::Jointcurrent udp_joint_current_;            //
+rm_ros_interfaces::msg::Jointenflag udp_joint_en_flag_;
+rm_ros_interfaces::msg::Jointposeeuler udp_joint_pose_euler_;
+rm_ros_interfaces::msg::Jointspeed udp_joint_speed_;
+rm_ros_interfaces::msg::Jointtemperature udp_joint_temperature_; 
+rm_ros_interfaces::msg::Jointvoltage udp_joint_voltage_;
 
 class RmArm: public rclcpp::Node
 {
@@ -159,7 +176,9 @@ public:
     void Arm_MoveL_Callback(rm_ros_interfaces::msg::Movel::SharedPtr msg);                                  //直线运动控制
     void Arm_MoveC_Callback(rm_ros_interfaces::msg::Movec::SharedPtr msg);                                  //圆弧运动控制
     void Arm_Movej_CANFD_Callback(rm_ros_interfaces::msg::Jointpos::SharedPtr msg);                         //角度透传控制
+    void Arm_Movej_CANFD_Custom_Callback(rm_ros_interfaces::msg::Jointposcustom::SharedPtr msg);    //角度透传控制高跟随下可自定义模式
     void Arm_Movep_CANFD_Callback(rm_ros_interfaces::msg::Cartepos::SharedPtr msg);                         //位姿透传控制
+    void Arm_Movep_CANFD_Custom_Callback(rm_ros_interfaces::msg::Carteposcustom::SharedPtr msg);    //位姿透传控制高跟随下可自定义模式
     void Arm_MoveJ_P_Callback(rm_ros_interfaces::msg::Movejp::SharedPtr msg);                               //位姿运动控制
     void Arm_Move_Stop_Callback(std_msgs::msg::Bool::SharedPtr msg);                                        //轨迹急停控制
     /**************************************************************************/
@@ -260,10 +279,12 @@ private:
     rclcpp::Subscription<rm_ros_interfaces::msg::Movec>::SharedPtr MoveC_Cmd;
     /*******************************************角度透传运动控制订阅器*************************************/
     rclcpp::Subscription<rm_ros_interfaces::msg::Jointpos>::SharedPtr Movej_CANFD_Cmd;
+    rclcpp::Subscription<rm_ros_interfaces::msg::Jointposcustom>::SharedPtr Movej_CANFD_Custom_Cmd;
     /*******************************************角度透传运动控制订阅器*************************************/
     // rclcpp::Subscription<rm_ros_interfaces::msg::Jointpos75>::SharedPtr Movej_CANFD_75_Cmd;
     /*******************************************位姿透传运动控制订阅器*************************************/
     rclcpp::Subscription<rm_ros_interfaces::msg::Cartepos>::SharedPtr Movep_CANFD_Cmd;
+    rclcpp::Subscription<rm_ros_interfaces::msg::Carteposcustom>::SharedPtr Movep_CANFD_Custom_Cmd;
     /****************************************MoveJ_P运动控制结果发布器*************************************/
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr MoveJ_P_Cmd_Result;
     /*******************************************MoveJ_P运动控制订阅器*************************************/
@@ -452,6 +473,8 @@ private:
     int udp_cycle_ = 5;                                //udp主动上报周期（ms）
     int udp_force_coordinate_ = 0;                     //udp主动上报系统六维力参考坐标系
     bool udp_hand_ = false;
+    int trajectory_mode_ = 0;
+    int radio_ = 50; 
 
     rclcpp::CallbackGroup::SharedPtr callback_group_sub1_;
     rclcpp::CallbackGroup::SharedPtr callback_group_sub2_;
@@ -486,6 +509,13 @@ private:
     rclcpp::Publisher<std_msgs::msg::UInt16>::SharedPtr Arm_Err_Result;                                              //机械臂报错发布器
     rclcpp::Publisher<std_msgs::msg::UInt16>::SharedPtr Arm_Coordinate_Result;                                       //力传感器基准坐标发布器
     rclcpp::Publisher<rm_ros_interfaces::msg::Handstatus>::SharedPtr Hand_Status_Result;                             //灵巧手数据发布器
+    rclcpp::Publisher<rm_ros_interfaces::msg::Armcurrentstatus>::SharedPtr Arm_Current_Status_Result;                //机械臂当前状态发布器
+    rclcpp::Publisher<rm_ros_interfaces::msg::Jointcurrent>::SharedPtr Joint_Current_Result;                         //关节当前电流发布器
+    rclcpp::Publisher<rm_ros_interfaces::msg::Jointenflag>::SharedPtr Joint_En_Flag_Result;                          //关节使能状态布器
+    rclcpp::Publisher<rm_ros_interfaces::msg::Jointposeeuler>::SharedPtr Joint_Pose_Euler_Result;                    //末端位姿欧拉角形式发布器
+    rclcpp::Publisher<rm_ros_interfaces::msg::Jointspeed>::SharedPtr Joint_Speed_Result;                             //关节速度发布器
+    rclcpp::Publisher<rm_ros_interfaces::msg::Jointtemperature>::SharedPtr Joint_Temperature_Result;                 //关节温度发布器
+    rclcpp::Publisher<rm_ros_interfaces::msg::Jointvoltage>::SharedPtr Joint_Voltage_Result;                         //关节电压发布器
     int connect_state = 0;                             //网络连接状态
     int come_time = 0;
     struct sockaddr_in clientAddr;

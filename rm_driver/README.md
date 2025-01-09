@@ -6,7 +6,7 @@
 
 <div align="center">
 
-# RealMan Robot rm_driver User Manual V1.2.1
+# RealMan Robot rm_driver User Manual V1.3
 
 RealMan Intelligent Technology (Beijing) Co., Ltd. 
 
@@ -18,6 +18,7 @@ Revision History:
 |V1.1	  | 7/8/2024  | Amend（Add GEN72 adapter files） |
 |V1.2	  | 9/10/2024 | Amend（Add ECO63 adapter files） |
 |V1.2.1 | 10/31/2024| Amend（Add dexterous hand udp topic） |
+|V1.3 | 12/25/2024| Amend（Add UDP reporting adaptation） |
 
 </div>
 
@@ -75,6 +76,9 @@ rm_driver:
     udp_cycle: 5                  # the active reporting cycle of UDP, which needs to be a multiple of 5.  
     udp_port: 8089                # Set the udp active reporting port   
     udp_force_coordinate: 0       # Set the base coordinate of the six-axis force when the system is forced, where 0 is the sensor coordinate system, 1 is the current work coordinate system, and 2 is the current tool coordinate system
+
+    trajectory_mode: 0            #When the high following mode is set, multiple modes are supported, including 0- complete transparent transmission mode, 1- curve fitting mode and 2- filtering mode.
+    radio: 50                     #Set the smoothing coefficient in curve fitting mode and filtering mode, ranging from 0 to 100. The larger the value, the better the smoothing effect.
 ```
 
 There are mainly the following parameters.
@@ -86,6 +90,8 @@ There are mainly the following parameters.
 * udp_cycle: the active reporting cycle of UDP, which needs to be a multiple of 5.
 * udp_port: set the udp active reporting port.
 * udp_force_coordinate: set the base coordinate of the six-axis force when the system is forced, where 0 is the sensor coordinate system (original data), 1 is the current work coordinate system, and 2 is the current tool coordinate system.
+* trajectory_mode：When the high following mode is set, multiple modes are supported, including 0- complete transparent transmission mode, 1- curve fitting mode and 2- filtering mode.
+* radio：Set the smoothing coefficient in curve fitting mode and filtering mode, ranging from 0 to 100. The larger the value, the better the smoothing effect.
 * In practice, we choose the corresponding launch file to start, which will automatically select the correct model. If there are special requirements, you can modify the corresponding parameters here. After modification, recompile the configuration in the workspace directory, and then the modified configuration will take effect.
 Run the colcon build command in the workspace directory.
 
@@ -140,8 +146,8 @@ The current rm_driver package is composed of the following files.
 │   ├── libRM_Service.so.1 -> libRM_Service.so.1.0.0      # API library file
 │   ├── libRM_Service.so.1.0 -> libRM_Service.so.1.0.0    # API library file
 │   ├── libRM_Service.so.1.0.0                            # API library file
-│   ├── linux_arm_service_release_v4.3.2.t1.tar.bz2       # API library file
-│   └── linux_x86_service_release_v4.3.2.t1.tar.bz2       # API library file
+│   ├── linux_arm_service_release_v4.3.7.t7.tar.bz2       # API library file
+│   └── linux_x86_service_release_v4.3.7.t7.tar.bz2       # API library file
 ├── package.xml                                           # dependency declaration file
 ├── README_CN.md
 ├── README.md

@@ -7,6 +7,7 @@
 #include <iostream>
 #include "control_msgs/action/follow_joint_trajectory.hpp"
 #include <sensor_msgs/msg/joint_state.hpp>
+#include <std_msgs/msg/bool.hpp>
 
 //RM Robot msg
 #include "rm_ros_interfaces/msg/jointpos.hpp"
@@ -41,12 +42,16 @@ private:
     rclcpp::Publisher<rm_ros_interfaces::msg::Jointpos>::SharedPtr joint_pos_publisher;
     // rclcpp::Publisher<rm_ros_interfaces::msg::Jointpos75>::SharedPtr joint_pos_publisher_75;
 
+    //声明话题订阅者
+    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr Get_Move_Stop_Cmd;
+
     rclcpp::TimerBase::SharedPtr State_Timer;
 
     rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID &uuid, std::shared_ptr<const FollowJointTrajectory::Goal> goal);
     rclcpp_action::CancelResponse handle_cancel(const std::shared_ptr<GoalHandleFJT> goal_handle);
     void execute_move(const std::shared_ptr<GoalHandleFJT> goal_handle);
     void handle_accepted(const std::shared_ptr<GoalHandleFJT> goal_handle);
+    void get_move_stop_callback(std_msgs::msg::Bool::SharedPtr msg);
 };
 
 #endif // Rm_Control_H

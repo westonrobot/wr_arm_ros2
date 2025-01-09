@@ -7,7 +7,7 @@
 
 <div align="center">
 
-# 睿尔曼机器人rm_ros_interface使用说明书V1.1
+# 睿尔曼机器人rm_ros_interface使用说明书V1.2
 
 
  
@@ -21,6 +21,7 @@
 | :---: | :---- | :---: |
 |V1.0 | 2024-2-18 | 拟制 |
 |V1.1 | 2024-7-8  | 修订(添加示教消息) |
+|V1.2 | 2024-12-25  | 修订(添加UDP上报消息) |
 
 </div>
 
@@ -61,6 +62,15 @@
 * 4.29[位置闭环控制-升降机构Liftheight_msg](#位置闭环控制-升降机构Liftheight_msg)
 * 4.30[获取升降机构状态-升降机构Liftstate_msg](#获取升降机构状态-升降机构Liftstate_msg)
 * 4.31[查询或设置UDP机械臂状态主动上报配置Setrealtimepush_msg](#查询或设置UDP机械臂状态主动上报配置Setrealtimepush_msg)
+* 4.32[UDP机械臂状态上报Armcurrentstatus_msg](#UDP机械臂状态上报Armcurrentstatus_msg)
+* 4.33[UDP关节电流上报Jointcurrent_msg](#UDP关节电流上报Jointcurrent_msg)
+* 4.34[UDP关节使能状态上报Jointenflag_msg](#UUDP关节使能状态上报Jointenflag_msg)
+* 4.35[UDP机械臂欧拉角位姿上报Jointposeeuler_msg](#UDP机械臂欧拉角位姿上报Jointposeeuler_msg)
+* 4.36[UDP关节速度上报Jointspeed_msg](#UDP关节速度上报Jointspeed_msg)
+* 4.37[UDP关节温度上报Jointtemperature_msg](#UDP关节温度上报Jointtemperature_msg)
+* 4.38[UDP关节电压上报Jointvoltage_msg](#UUDP关节电压上报Jointvoltage_msg)
+* 4.39[自定义高跟随模式角度透传Jointposcustom_msg](#角度透传Jointposcustom_msg)
+* 4.40[自定义高跟随模式位姿透传Carteposcustom_msg](#位姿透传Carteposcustom_msg)
 
 ## rm_ros_interface功能包说明
 rm_ros_interface功能包的主要作用为为机械臂在ROS2的框架下运行提供必要的 消息文件，在下文中将通过以下几个方面详细介绍该功能包。
@@ -81,40 +91,49 @@ rm_ros_interface功能包的主要作用为为机械臂在ROS2的框架下运行
 ├── include                       #依赖头文件文件夹
 │   └── rm_ros_interfaces
 ├── msg                          #当前的消息文件（详细请看下方介绍）
-│   ├── Armoriginalstate_msg
-│   ├── Armsoftversion_msg
-│   ├── Armstate_msg
-│   ├── Cartepos_msg
-│   ├── Forcepositionmovejoint75_msg
-│   ├── Forcepositionmovejoint_msg
-│   ├── Forcepositionmovepose_msg
-│   ├── Force_Position_State_msg
-│   ├── Getallframe_msg
-│   ├── GetArmState_Command_msg
-│   ├── Gripperpick_msg
-│   ├── Gripperset_msg
-│   ├── Handangle_msg
-│   ├── Handforce_msg
-│   ├── Handposture_msg
-│   ├── Handseq_msg
-│   ├── Handspeed_msg
-│   ├── Jointerrclear_msg
-│   ├── Jointerrorcode75_msg
-│   ├── Jointerrorcode_msg
-│   ├── Jointpos75_msg
-│   ├── Jointpos_msg
-│   ├── Liftheight_msg
-│   ├── Liftspeed_msg
-│   ├── Liftstate_msg
-│   ├── Movec_msg
-│   ├── Movej75_msg
-│   ├── Movej_msg
-│   ├── Movejp_msg
-│   ├── Movel_msg
-│   ├── Setforceposition_msg
-│   ├── Setrealtimepush_msg
-│   ├── Sixforce_msg
-│   └── Stop_msg
+│   ├── Armcurrentstatus.msg
+│   ├── Armoriginalstate.msg
+│   ├── Armsoftversion.msg
+│   ├── Armstate.msg
+│   ├── Cartepos.msg
+│   ├── Carteposcustom.msg
+│   ├── Forcepositionmovejoint.msg
+│   ├── Forcepositionmovepose.msg
+│   ├── Force_Position_State.msg
+│   ├── Getallframe.msg
+│   ├── GetArmState_Command.msg
+│   ├── Gripperpick.msg
+│   ├── Gripperset.msg
+│   ├── Handangle.msg
+│   ├── Handforce.msg
+│   ├── Handposture.msg
+│   ├── Handseq.msg
+│   ├── Handspeed.msg
+│   ├── Handstatus.msg
+│   ├── Jointcurrent.msg
+│   ├── Jointenflag.msg
+│   ├── Jointerrclear.msg
+│   ├── Jointerrorcode.msg
+│   ├── Jointposeeuler.msg
+│   ├── Jointpos.msg
+│   ├── Jointposcustom.msg
+│   ├── Jointspeed.msg
+│   ├── Jointteach.msg
+│   ├── Jointtemperature.msg
+│   ├── Jointvoltage.msg
+│   ├── Liftheight.msg
+│   ├── Liftspeed.msg
+│   ├── Liftstate.msg
+│   ├── Movec.msg
+│   ├── Movej.msg
+│   ├── Movejp.msg
+│   ├── Movel.msg
+│   ├── Ortteach.msg
+│   ├── Posteach.msg
+│   ├── Setforceposition.msg
+│   ├── Setrealtimepush.msg
+│   ├── Sixforce.msg
+│   └── Stop.msg
 ├── package.xml                       #依赖声明文件
 └── src
 ```
@@ -583,5 +602,112 @@ __force_coordinate__
 系统外受力数据的坐标系，0 为传感器坐标系 1 为当前工作坐标系 2 为当前工具坐标系。  
 __ip__  
 自定义的上报目标IP 地址。  
+### UDP机械臂状态上报Armcurrentstatus_msg
+```
+uint16 arm_current_status
+```  
+__msg成员__  
+__arm_current_status__  
+机械臂状态，
+    0 - RM_IDLE_E             // 使能但空闲状态
+    1 - RM_MOVE_L_E           // move L运动中状态
+    2 - RM_MOVE_J_E           // move J运动中状态
+    3 - RM_MOVE_C_E           // move C运动中状态
+    4 - RM_MOVE_S_E           // move S运动中状态
+    5 - RM_MOVE_THROUGH_JOINT_E // 角度透传状态
+    6 - RM_MOVE_THROUGH_POSE_E  // 位姿透传状态
+    7 - RM_MOVE_THROUGH_FORCE_POSE_E // 力控透传状态
+    8 - RM_MOVE_THROUGH_CURRENT_E // 电流环透传状态
+    9 - RM_STOP_E             // 急停状态
+    10 - RM_SLOW_STOP_E        // 缓停状态
+    11 - RM_PAUSE_E            // 暂停状态
+    12 - RM_CURRENT_DRAG_E     // 电流环拖动状态
+    13 - RM_SENSOR_DRAG_E      // 六维力拖动状态
+    14 - RM_TECH_DEMONSTRATION_E // 示教状态
+### UDP关节电流上报Jointcurrent_msg
+```
+float32[] joint_current
+```  
+__msg成员__  
+__joint_current__  
+当前关节电流，精度 0.001mA。
+### UDP关节使能状态上报Jointenflag_msg
+```
+bool[] joint_en_flag
+```  
+__msg成员__  
+__joint_en_flag__  
+当前关节使能状态 ，1 为上使能，0 为掉使能。
+### UDP机械臂欧拉角位姿上报Jointposeeuler_msg
+```
+float32[3] euler
+float32[3] position
+```  
+__msg成员__  
+__euler__  
+当前路点姿态欧拉角，精度 0.001rad。
+__position__
+当前路点位置，精度 0.000001M。
+### UDP关节速度上报Jointspeed_msg
+```
+float32[] joint_speed
+```  
+__msg成员__  
+__joint_speed__  
+当前关节速度，精度0.02RPM。
+### UDP关节温度上报Jointtemperature_msg
+```
+float32[] joint_temperature
+```  
+__msg成员__  
+__joint_temperature__  
+当前关节温度，精度 0.001℃。
+### UDP关节电压上报Jointvoltage_msg
+```
+float32[] joint_voltage
+```  
+__msg成员__  
+__joint_voltage__  
+当前关节电压，精度 0.001V。
+
+### 自定义高跟随模式角度透传Jointposcustom_msg
+```
+float32[] joint  
+bool follow  
+float32 expand  
+uint8 dof
+uint8 trajectory_mode
+uint8 radio
+```  
+__msg成员__  
+__joint__
+关节角度，float类型，单位：弧度。  
+__follow__  
+跟随状态，bool类型，true高跟随，false低跟随，不设置默认高跟随。  
+__expand__  
+拓展关节，float类型，单位：弧度。  
+__dof__  
+机械臂自由度信息。    
+__trajectory_mode__  
+设置高跟随模式下，支持多种模式，0-完全透传模式、1-曲线拟合模式、2-滤波模式。  
+__radio__   
+设置曲线拟合模式下平滑系数（范围0-100）或者滤波模式下的滤波参数（范围0-1000），数值越大表示平滑效果越好。
+### 自定义高跟随模式位姿透传Carteposcustom_msg
+```
+geometry_msgs/Pose pose  
+bool follow
+uint8 trajectory_mode
+uint8 radio
+```  
+__msg成员__  
+__pose__  
+机械臂位姿，geometry_msgs/Pose类型，x、y、z坐标（float类型，单位：m）+四元数。  
+__follow __ 
+跟随状态，bool类型，true高跟随，false低跟随，不设置默认高跟随。  
+__trajectory_mode__   
+设置高跟随模式下，支持多种模式，0-完全透传模式、1-曲线拟合模式、2-滤波模式。  
+__radio__      
+设置曲线拟合模式下平滑系数（范围0-100）或者滤波模式下的滤波参数（范围0-1000），数值越大表示平滑效果越好。
+
 
 主要为套用API实现的一些机械臂本体的功能，其详细介绍和使用在此不详细展开，可以通过专门的文档《[睿尔曼机械臂ROS2话题详细说明](https://github.com/RealManRobot/ros2_rm_robot/blob/main/rm_driver/doc/%E7%9D%BF%E5%B0%94%E6%9B%BC%E6%9C%BA%E6%A2%B0%E8%87%82ROS2rm_driver%E8%AF%9D%E9%A2%98%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E.md)》进行查看。
